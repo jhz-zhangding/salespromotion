@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/page_view_1"
+    >
+
+    <RelativeLayout
+        android:layout_width="1000dp"
+        android:layout_height="600dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/blue"
+        >
+
+        <LinearLayout
+            android:id="@+id/first_product_name_rl"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="60dp"
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true"
+            >
+
+            <TextView
+                android:id="@+id/first_product_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/product_name"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_marginLeft="60dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                />
+            <EditText
+                android:id="@+id/sales_create_model_name_et"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="250dp"
+                android:minHeight="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_gravity="center_vertical"
+                android:background="@color/white"
+                android:textColor="#3d3d3d"
+                android:textSize="24sp"
+                android:text=""
+                />
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sales_create_model_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:layout_below="@+id/first_product_name_rl"
+            android:layout_centerHorizontal="true"
+            android:horizontalSpacing="20dp"
+            android:numColumns="4"
+            android:verticalSpacing="20dp" />
+
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sales_create_model_list"
+            android:layout_marginBottom="60dp"
+            >
+
+            <TextView
+                android:id="@+id/cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:background="@drawable/next_step_bg"
+                android:gravity="center"
+                android:text="取消"
+                android:textColor="@color/white"
+                android:textSize="28sp"
+                android:padding="15sp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="100dp"
+                android:layout_alignParentBottom="true"
+                />
+
+            <TextView
+                android:id="@+id/confirm_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:background="@drawable/next_step_bg"
+                android:gravity="center"
+                android:text="确认"
+                android:textColor="@color/white"
+                android:textSize="28sp"
+                android:padding="15sp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="100dp"
+                android:layout_alignParentBottom="true"
+                />
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

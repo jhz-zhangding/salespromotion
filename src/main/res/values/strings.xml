@@ -1,0 +1,143 @@
+<resources>
+    <string name="app_name">促销助手</string>
+
+
+    <string name="product_name">商品名称：</string>
+    <string name="product_detail">商品名称尽量详细，如下</string>
+    <string name="product_1">达利园法式小面包</string>
+    <string name="product_2">蒙牛纯甄零添加酸牛奶</string>
+    <string name="product_3">新养道零乳糖牛奶</string>
+    <string name="next_step">下一步</string>
+    <string name="select_product_group">选择商品分类</string>
+    <string name="food">食品</string>
+    <string name="drink">饮料</string>
+    <string name="daily">日化</string>
+    <string name="other">其他</string>
+
+    <string name="activity_text">活动描述：</string>
+    <string name="activity_text1">活动描述，如下</string>
+    <string name="activity1">单票购物满50元，立返20元现金，以此类推，多买多送</string>
+    <string name="activity2">满288元赠马克杯，满298元赠冰包</string>
+    <string name="finish">完成</string>
+
+
+    <string name="mouse_text">空鼠按键</string>
+
+    <string name="mouse_key_power">按键1</string>
+    <string name="mouse_key_game">按键2</string>
+    <string name="mouse_key_home">按键3</string>
+    <string name="mouse_key_back">按键4</string>
+
+
+    <string name="close_mask_and_start">关闭面罩\n开始控制</string>
+    <string name="click_and_start">关闭面罩即可开始促销</string>
+    <string name="create_model">点击生成模板</string>
+
+    <string name="cancel">取消</string>
+    <string name="affirm">确认</string>
+    <string name="confirm">确定</string>
+
+    <string name="faceValue">表情</string>
+    <string name="action_value">动作</string>
+
+    <string name="addmedia">1.自定义上传图片后，广告播放时图片文件会替换当前子项目包含的表情包。（建议图片大小为1280*800）。\n图片仅支持：JPG和PNG</string>
+    <string name="addmedia2">2.自定义上传视频后，广告播放时视频文件会覆盖迎宾语声音和机器人表情。\n视频仅支持：MP4</string>
+    <string name="addmedia3">3.上传视频后，无法上传图片与音频，同样的，上传图片或音频后无法上传视频。\n音频仅支持：MP3和WAV</string>
+    <string name="addmedia4">4.上传音频文件后，音频会覆盖迎宾语。</string>
+
+
+    <string name="more_sales_goods">更换促销商品</string>
+    <string name="more_sales_model">更换促销设置</string>
+
+    <!-- ===================== -->
+    <string-array name="face_time_bodycommercial">
+        <item>3</item>
+        <item>4</item>
+        <item>6</item>
+        <item>4</item>
+        <item>5</item>
+        <item>3</item>
+        <item>3</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>4</item>
+        <item>4</item>
+        <item>5</item>
+        <item>3</item>
+        <item>3</item>
+        <item>6</item>
+        <item>5</item>
+        <item>4</item>
+        <item>4</item>
+        <item>4</item>
+        <item>3</item>
+        <item>4</item>
+        <item>4</item>
+        <item>6</item>
+        <item>4</item>
+        <item>4</item>
+        <item>6</item>
+        <item>3</item>
+        <item>3</item>
+        <item>3</item>
+        <item>6</item>
+        <item>2</item>
+        <item>4</item>
+        <item>3</item>
+        <item>6</item>
+        <item>4</item>
+        <item>4</item>
+        <item>3</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="action_light">
+        <item>3</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+    </string-array>
+
+    <string-array name="light">
+        <item>无</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>300</item>
+    </string-array>
+
+    <string name="txt_import_or_export">共%1$s个，正在处理第%2$s个，失败%3$s个</string>
+    <string name="please_input">请插入U盘</string>
+    <string name="know">知道了</string>
+    <string name="importing">正在导入，请稍等...</string>
+
+    <string name="no_data">没有需要导入的数据</string>
+    <string name="data_import_finish">数据导入完成</string>
+    <string name="data_first_import_finish">初始化数据完成</string>
+    <string name="data_import_fial">数据导入失败</string>
+    <string name="data_first_import_fial">初始化数据失败</string>
+
+</resources>

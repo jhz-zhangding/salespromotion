@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+
+    <color name="first_background">#8EAFD0</color>
+
+    <color name="first_goods_selected">#C39036</color>
+    <color name="first_goods_unselected">#BCBCBC</color>
+
+    <color name="green">#33FF00</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="main_left_bg_color">#2f323b</color>
+    <color name="black_40">#40000000</color>
+    <color name="black_50">#40000000</color>
+    <color name="color_black">#70000000</color>
+    <color name="color_text">#A0D469</color>
+    <color name="color_transparent">#00000000</color>
+    <color name="color_838383">#838383</color>
+    <color name="text_color">#6c8f47</color>
+    <color name="text_bg">#cbe5af</color>
+    <color name="color_414141">#414141</color>
+    <drawable name="color_414141">#414141</drawable>
+    <drawable name="color_838383">#838383</drawable>
+    <color name="color_bababa">#BABABA</color>
+
+    <color name="guest_text_color">#ffffff</color>
+
+    <color name="orange">#ff8f00</color>
+
+    <!-- 通用蓝色背景色 -->
+    <color name="main_bg_color">#2676c6</color>
+
+    <color name="color_7ca">#887cacda</color>
+    <color name="color_2775c7">#2775C7</color>
+    <color name="transparent">#00000000</color>
+    <color name="color_83b4e3">#83b4e3</color>
+    <color name="color_55ffffff">#55ffffff</color>
+    <color name="color_cec8c8">#cec8c8</color>
+
+    <color name="unfocused">#cccccccc</color>
+    <color name="button_true">#FF8E01</color>
+    <color name="orange_bg_color">#7eaddc</color>
+
+    <color name="color_78e2fd">#78e2fd</color>
+
+</resources>

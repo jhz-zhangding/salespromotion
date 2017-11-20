@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/main_bg"
+    android:paddingBottom="@dimen/padding"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".main.MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/head_rl"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="项目名称"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/white" />
+
+        <ImageView
+            android:id="@+id/rlExport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/rlImport"
+            android:padding="@dimen/padding_20"
+            android:src="@mipmap/export" />
+
+        <ImageView
+            android:id="@+id/rlImport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp"
+            android:padding="@dimen/padding_20"
+            android:src="@mipmap/import_img" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/head_rl"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="270dp"
+            android:layout_height="match_parent"
+            android:layout_margin="36dp"
+            android:background="@drawable/button_bg"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="@string/mouse_text"
+                android:textColor="@color/white"
+                android:textSize="26sp" />
+
+            <RelativeLayout
+                android:id="@+id/main_key_power"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/selector_button_select_bg"
+                android:minHeight="60dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:text="@string/mouse_key_power"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/mouse_key_power" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/main_key_game"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/selector_button_select_bg"
+                android:gravity="center"
+                android:minHeight="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:text="@string/mouse_key_game"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/mouse_key_game" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/main_key_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/selector_button_select_bg"
+                android:minHeight="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:text="@string/mouse_key_home"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/mouse_key_home" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/main_key_back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/selector_button_select_bg"
+                android:minHeight="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:gravity="center"
+                    android:text="@string/mouse_key_back"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@mipmap/mouse_key_back" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/main_create_model_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:background="#386498"
+                android:gravity="center"
+                android:minHeight="50dp"
+                android:text="关闭面罩即可促销"
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="80dp">
+
+                <TextView
+                    android:id="@+id/main_play_key_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="播放方式：点按空鼠"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <ImageView
+                    android:id="@+id/main_play_key_img"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="3dp"
+                    android:layout_marginRight="3dp"
+                    android:layout_toRightOf="@+id/main_play_key_text"
+                    android:background="@mipmap/mouse_key_power" />
+
+                <TextView
+                    android:id="@+id/main_key_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/main_play_key_img"
+                    android:text="键"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <TextView
+                    android:id="@+id/main_play_mode_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_toRightOf="@+id/main_key_text"
+                    android:text="顺序循环播放"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/main_play_mode_text"
+                    android:background="@drawable/background"
+                    android:gravity="center"
+                    >
+
+                    <ImageView
+                        android:id="@+id/main_play_mode_img"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@mipmap/circle"
+                        />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/main_item_edit_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/button_bg"
+                    android:text="编辑"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+
+                <TextView
+                    android:id="@+id/main_item_add_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:layout_toLeftOf="@+id/main_item_edit_btn"
+                    android:background="@drawable/button_bg"
+                    android:text="新增"
+                    android:textColor="@color/white"
+                    android:textSize="26sp" />
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/main_list_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:divider="#004c91d1"
+                android:dividerHeight="1dp"
+                android:scrollbars="none"
+                android:cacheColorHint="#00000000"
+                android:listSelector="#00000000"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp">
+
+                <!--<TextView-->
+                    <!--android:id="@+id/main_exchange_goods"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginRight="20dp"-->
+                    <!--android:layout_toLeftOf="@+id/main_more_model"-->
+                    <!--android:background="@drawable/button_bg"-->
+                    <!--android:text="@string/more_sales_goods"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="28sp" />-->
+
+                <TextView
+                    android:id="@+id/main_more_model"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/button_bg"
+                    android:text="@string/more_sales_model"
+                    android:textColor="@color/white"
+                    android:textSize="28sp" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

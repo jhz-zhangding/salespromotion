@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/page_view_2"
+    android:visibility="gone"
+    >
+
+    <RelativeLayout
+        android:layout_width="1000dp"
+        android:layout_height="600dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/blue"
+        android:layout_marginRight="50dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="800dp"
+            android:layout_height="300dp"
+            android:background="@drawable/white_dashed"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            >
+
+            <TextView
+                android:id="@+id/first_select_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_product_group"
+                android:textSize="40sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="40dp"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/sales_first_group_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/first_select_tv"
+                android:layout_marginTop="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                android:horizontalSpacing="20dp"
+                android:numColumns="4"
+                android:verticalSpacing="20dp" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/first_next_btn_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/next_step_bg"
+            android:text="@string/next_step"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:padding="15sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="85dp"
+            android:layout_marginRight="15dp"
+            />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/robot"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="-330dp"
+        />
+
+</RelativeLayout>
