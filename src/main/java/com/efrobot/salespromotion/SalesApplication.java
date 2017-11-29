@@ -23,7 +23,7 @@ public class SalesApplication extends Application {
 
     private DbHelper mDbHelper;
 
-    public boolean isNeedStartService = false;
+    public static boolean isNeedStartService = false;
 
     public MediaPlayDialog mediaPlayDialog;
 

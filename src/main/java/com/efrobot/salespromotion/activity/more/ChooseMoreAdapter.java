@@ -33,7 +33,7 @@ public class ChooseMoreAdapter extends RecyclerView.Adapter<ChooseMoreAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_goods_group_list, null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.setting_item_goods_group_list, null);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }

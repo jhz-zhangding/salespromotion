@@ -36,7 +36,7 @@ public class ReceiveMaskBroadcast extends BroadcastReceiver {
             boolean isClose = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
 
             if (isClose) {
-                boolean isNeedOpen = SalesApplication.from(context).isNeedStartService;
+                boolean isNeedOpen = SalesApplication.isNeedStartService;
                 if(isNeedOpen) {
                     new Timer().schedule(new TimerTask() {
                         @Override

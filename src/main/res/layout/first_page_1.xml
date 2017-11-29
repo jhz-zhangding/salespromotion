@@ -1,55 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/page_view_1"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="1000dp"
-        android:layout_height="600dp"
+        android:layout_height="550dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/blue"
         android:layout_marginRight="50dp"
-        >
+        android:background="@drawable/blue">
 
         <LinearLayout
             android:id="@+id/first_product_name_rl"
             android:layout_width="800dp"
-            android:layout_height="300dp"
-            android:background="@drawable/white_dashed"
-            android:layout_marginTop="100dp"
-            android:orientation="horizontal"
+            android:layout_height="250dp"
             android:layout_centerHorizontal="true"
-            >
+            android:layout_marginTop="100dp"
+            android:background="@drawable/white_dashed"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/first_product_name_tv"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/product_name"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
                 android:layout_marginLeft="60dp"
-                android:layout_gravity="center_vertical"
-                android:gravity="center"
-                />
-            <EditText
-                android:id="@+id/first_product_name_et"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/first_product_name_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/product_name"
+                    android:textColor="@color/white"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/first_product_name_et"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:background="@color/white"
+                    android:minHeight="50dp"
+                    android:minWidth="250dp"
+                    android:text=""
+                    android:textColor="#3d3d3d"
+                    android:textSize="24sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="250dp"
-                android:minHeight="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/white"
-                android:textColor="#3d3d3d"
-                android:textSize="24sp"
-                android:text=""
-                />
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="30dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/add_picture_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/next_step_bg"
+                    android:gravity="center"
+                    android:minHeight="50dp"
+                    android:minWidth="100dp"
+                    android:padding="15dp"
+                    android:text="点击添加图片"
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/add_picture_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center"
+                    android:minHeight="50dp"
+                    android:minWidth="100dp"
+                    android:text=""
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
+
+                <ImageView
+                    android:id="@+id/del_picture_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/del"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
 
@@ -57,57 +102,52 @@
             android:id="@+id/first_detail_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/product_detail"
-            android:textColor="@color/white"
             android:layout_below="@+id/first_product_name_rl"
-            android:textSize="24sp"
             android:layout_marginLeft="100dp"
             android:layout_marginTop="50dp"
-            />
+            android:text="@string/product_detail"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_below="@+id/first_detail_tv"
             android:layout_marginLeft="100dp"
             android:layout_marginTop="30dp"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#BD8F60"
+                android:gravity="center"
+                android:padding="5dp"
                 android:text="@string/product_1"
-                android:gravity="center"
-                android:textSize="20sp"
                 android:textColor="@color/white"
-                android:padding="5dp"
-                />
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
                 android:background="#2Eb6A6"
-                android:text="@string/product_2"
                 android:gravity="center"
-                android:textSize="20sp"
-                android:textColor="@color/white"
                 android:padding="5dp"
-                android:layout_marginLeft="15dp"
-                />
+                android:text="@string/product_2"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#A62E6F"
-                android:text="@string/product_3"
-                android:gravity="center"
-                android:textSize="20sp"
-                android:textColor="@color/white"
-                android:padding="5dp"
                 android:layout_marginLeft="15dp"
-                />
+                android:background="#A62E6F"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/product_3"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
 
 
         </LinearLayout>
@@ -117,25 +157,129 @@
             android:id="@+id/first_next_btn_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/next_step_bg"
-            android:text="@string/next_step"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:padding="15sp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="85dp"
             android:layout_marginRight="15dp"
-            />
+            android:background="@drawable/next_step_bg"
+            android:padding="15sp"
+            android:text="@string/next_step"
+            android:textColor="@color/white"
+            android:textSize="28sp" />
 
     </RelativeLayout>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/robot"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="-330dp"
-        />
+        android:src="@mipmap/robot" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="160dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/shop_car" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily2" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily3" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily4" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily5" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/daily6" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/drink0" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/drink1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/drink2" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/drink3" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/drink4" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food2" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food3" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food4" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food5" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/food6" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/other" />
+
+
+    </LinearLayout>
 
 </RelativeLayout>

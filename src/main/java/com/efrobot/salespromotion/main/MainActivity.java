@@ -122,9 +122,15 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        SalesApplication.isNeedStartService = true;
+        L.e(TAG, "onResume isNeedStartService = " + SalesApplication.isNeedStartService);
+    }
+
+    @Override
     protected void onViewInit() {
         super.onViewInit();
-        SalesApplication.from(this).isNeedStartService = true;
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
 
         dataManager = DataManager.getInstance(getContext());
@@ -902,7 +908,8 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     @Override
     protected void onPause() {
         super.onPause();
-
+        SalesApplication.isNeedStartService = false;
+        L.e(TAG, "onPause isNeedStartService = " + SalesApplication.isNeedStartService);
     }
 
     @Override
@@ -913,6 +920,5 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SalesApplication.from(this).isNeedStartService = false;
     }
 }

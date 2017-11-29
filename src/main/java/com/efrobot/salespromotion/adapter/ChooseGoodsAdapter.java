@@ -6,11 +6,15 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.efrobot.salespromotion.R;
 
 import java.util.List;
+
+import static com.efrobot.salespromotion.R.id.face_action_item_img;
 
 
 public class ChooseGoodsAdapter extends RecyclerView.Adapter<ChooseGoodsAdapter.ViewHolder> {
@@ -45,13 +49,22 @@ public class ChooseGoodsAdapter extends RecyclerView.Adapter<ChooseGoodsAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (list.get(position).equals(checkContent)) {
 //            holder.textView.setBackgroundResource(R.drawable.diy_default_setting_btn_bg);
-            holder.textView.setSelected(true);
+            holder.linearLayout.setSelected(true);
         } else {
             if (position == mSelectPosition) {
-                holder.textView.setSelected(true);
+                holder.linearLayout.setSelected(true);
             } else {
-                holder.textView.setSelected(false);
+                holder.linearLayout.setSelected(false);
             }
+        }
+        if(list.get(position).equals("食品")) {
+            holder.imageView.setImageResource(R.mipmap.food_img);
+        } else if(list.get(position).equals("饮料")) {
+            holder.imageView.setImageResource(R.mipmap.drink_img);
+        } else if(list.get(position).equals("日化")) {
+            holder.imageView.setImageResource(R.mipmap.daily_img);
+        } else if(list.get(position).equals("其他")) {
+            holder.imageView.setImageResource(R.mipmap.other_img);
         }
         holder.textView.setText(list.get(position));
 
@@ -64,12 +77,16 @@ public class ChooseGoodsAdapter extends RecyclerView.Adapter<ChooseGoodsAdapter.
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        LinearLayout linearLayout;
         TextView textView;
+        ImageView imageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            linearLayout = (LinearLayout) itemView.findViewById(R.id.face_action_item_ll);
             textView = (TextView) itemView.findViewById(R.id.face_action_item_text);
-            textView.setOnClickListener(this);
+            imageView = (ImageView) itemView.findViewById(face_action_item_img);
+            linearLayout.setOnClickListener(this);
         }
 
         @Override

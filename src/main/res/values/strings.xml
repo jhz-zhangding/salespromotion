@@ -3,6 +3,7 @@
 
 
     <string name="product_name">商品名称：</string>
+    <string name="product_picture">商品图片(可选)：</string>
     <string name="product_detail">商品名称尽量详细，如下</string>
     <string name="product_1">达利园法式小面包</string>
     <string name="product_2">蒙牛纯甄零添加酸牛奶</string>

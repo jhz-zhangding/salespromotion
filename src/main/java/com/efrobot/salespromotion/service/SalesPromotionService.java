@@ -97,6 +97,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private String goodsName = "";
     private String goodsGroup = "";
     private String goodsDetail = "";
+    private String picPath = "";
 
     public SalesPromotionService() {
     }
@@ -130,11 +131,13 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             goodsName = list.get(lastIndex).getGoodsName();
             goodsGroup = list.get(lastIndex).getGoodsGroup();
             goodsDetail = list.get(lastIndex).getGoodsDescription();
+            picPath = list.get(lastIndex).getSpareOne() == null ? "" : list.get(lastIndex).getSpareOne();
         }
         mPlayMode = PreferencesUtils.getInt(this, SalesConstant.PLAY_MODE, SalesConstant.CIRCLE_MODE);
 
 
         mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 3000);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -148,6 +151,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public final int VIDEO_FINISH = 3;
     public final int MUSIC_NEED_SAY = 4;
     public final int CLEAR_SPEECH_SLEEP = 5;
+    public final int SEND_CLEAR_PIC = 6;
+    public final int SHOW_GOODS_PIC = 7;
+    public final int START_AUTO_PLAY = 8;
+    private int clearPicTime = 3000;
     public Handler mHandle = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -176,6 +183,21 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     removeSpeechState(SalesPromotionService.this, 11);
                     sendEmptyMessageDelayed(CLEAR_SPEECH_SLEEP, 5000);
                     closeSpeechDiscern(getApplicationContext());
+                    break;
+                case SEND_CLEAR_PIC:
+                    L.e(TAG, "SEND_CLEAR_PIC" + System.currentTimeMillis());
+                    if (goodsPicDialog != null) {
+                        goodsPicDialog.dismiss();
+                    }
+                    break;
+                case SHOW_GOODS_PIC:
+                    if (goodsPicDialog != null) {
+                        goodsPicDialog.dismiss();
+                    }
+                    showGoodsPic(picPath);
+                    break;
+                case START_AUTO_PLAY:
+                    startPlayMode(SalesConstant.ItemType.POWER_TYPE);
                     break;
             }
         }
@@ -267,6 +289,17 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                         String finalTtsString = currentBean.getOther().replace(SalesConstant.ProjectInfo.PRODUCT_NAME, goodsName).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_GROUP, goodsGroup).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_DETAIL, goodsDetail);
+                        if(!TextUtils.isEmpty(picPath)) {
+                            if (finalTtsString.contains(goodsName)) {
+                                String[] ttsStrings = finalTtsString.split(goodsName);
+                                int lastLength = 0;
+                                for (int i = 0; i < ttsStrings.length; i++) {
+                                    int len = lastLength + ttsStrings[i].length();
+                                    lastLength = len + goodsName.length();L.e(TAG, "SHOW_GOODS_PIC：" + len * wordSpeed);
+                                    mHandle.sendEmptyMessageDelayed(SHOW_GOODS_PIC, len * wordSpeed);
+                                }
+                            }
+                        }
 
                         if (!TextUtils.isEmpty(currentBean.getFace())) {
                             isFaceFinish = false;
@@ -276,7 +309,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                             TtsUtils.sendTts(getApplicationContext(), finalTtsString);
                         }
 
-                        int ttsLength = currentBean.getOther().length();
+                        int ttsLength = finalTtsString.length();
                         long ttsTime = ttsLength * wordSpeed;
                         L.e(TAG, "ttsLength=" + ttsLength + "- - ttsTime=" + ttsTime);
                         if (mHandle != null) {
@@ -349,6 +382,33 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         } else {
             TtsUtils.sendTts(context, "当前暂无数据");
         }
+    }
+
+    private Dialog goodsPicDialog;
+
+    private void showGoodsPic(String picPath) {
+        File mFile = new File(picPath);
+        if (mFile.exists()) {
+            if(goodsPicDialog == null) {
+                goodsPicDialog = new Dialog(this, R.style.Dialog_Fullscreen);
+                View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
+                ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
+                playAdPicture(adPlayerPic, mFile);
+                goodsPicDialog.setContentView(currentView);
+                goodsPicDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+                //图片展示时间只有clearPicTime秒
+            }
+            goodsPicDialog.show();
+            sendRemovePicMess();
+        }
+    }
+
+    //移除图片
+    private void sendRemovePicMess() {
+        if (mHandle.hasMessages(SEND_CLEAR_PIC)) {
+            mHandle.removeMessages(SEND_CLEAR_PIC);
+        }
+        mHandle.sendEmptyMessageDelayed(SEND_CLEAR_PIC, clearPicTime);
     }
 
     private boolean isAllPlayFinish() {
@@ -518,6 +578,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
      * 暂停
      **/
     private boolean isPause = false;
+
     private void pause() {
         hitRobotHead();
         removeSpeechState(SalesPromotionService.this, 13);

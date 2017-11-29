@@ -7,19 +7,35 @@
     android:paddingLeft="15dp"
     android:paddingRight="15dp"
     android:paddingTop="9dp">
-
-    <TextView
-        android:id="@+id/face_action_item_text"
+    
+    <LinearLayout
+        android:id="@+id/face_action_item_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:minWidth="180dp"
+        android:minHeight="50dp"
         android:background="@drawable/setting_button_bg"
-        android:ellipsize="end"
         android:gravity="center"
-        android:padding="8dp"
-        android:singleLine="true"
-        android:text=""
-        android:textColor="@color/white"
-        android:textSize="22sp" />
+        >
+        <TextView
+            android:id="@+id/face_action_item_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:padding="8dp"
+            android:singleLine="true"
+            android:text="饮料"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+        
+        <ImageView
+            android:id="@+id/face_action_item_img"
+            android:layout_height="40dp"
+            android:layout_width="40dp" />
+        
+    </LinearLayout>
+
+    
 
 </LinearLayout>
