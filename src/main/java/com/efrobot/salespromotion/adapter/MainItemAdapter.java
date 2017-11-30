@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
+import com.efrobot.salespromotion.SalesApplication;
 import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.DataManager;
@@ -47,13 +48,10 @@ public class MainItemAdapter extends BaseAdapter {
 
     public void setProjectInfo() {
         //替换默认商品词条
-        List<MainItemContentBean> goodsList = MainDataManager.getInstance(mContext).queryAllContent();
-        if (null != goodsList && goodsList.size() > 0) {
-            int lastIndex = goodsList.size() - 1;
-            this.goodsNameStr = goodsList.get(lastIndex).getGoodsName() == null ? "" : goodsList.get(lastIndex).getGoodsName();
-            this.goodsGroupStr = goodsList.get(lastIndex).getGoodsGroup() == null ? "" : goodsList.get(lastIndex).getGoodsGroup();
-            this.goodsDetailStr = goodsList.get(lastIndex).getGoodsDescription() == null ? "" : goodsList.get(lastIndex).getGoodsDescription();
-        }
+        MainItemContentBean mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
+        this.goodsNameStr = mainItemContentBean.getGoodsName() == null ? "" : mainItemContentBean.getGoodsName();
+        this.goodsGroupStr = mainItemContentBean.getGoodsGroup() == null ? "" : mainItemContentBean.getGoodsGroup();
+        this.goodsDetailStr = mainItemContentBean.getGoodsDescription() == null ? "" : mainItemContentBean.getGoodsDescription();
     }
 
     public void updateSourceData(List<ItemsContentBean> list) {

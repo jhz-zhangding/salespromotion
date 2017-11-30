@@ -49,6 +49,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SalesPromotionService extends Service implements OnKeyEventListener, OnRobotStateChangeListener {
 
@@ -72,14 +74,19 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             isPictureFinish = true,
             isDanceFinish = true;
 
+    //设置图片显示3秒消失
+    private long picDismissTime = 3000;
+
     //当前播放下条目
     private int currentIndex = 0;
 
     //当前播放模式 循环 顺序
     private int mPlayMode = 0;
 
+    //机器人运动管理器
     private GroupManager groupManager;
 
+    //音乐管理器
     private MusicPlayer musicPlayer;
 
     private final int POWER_TYPE = 1;
@@ -92,12 +99,15 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private int backIndex = 0;
 
     private MoveManager moveManager;
+    //声音管理器
     private AudioManager audio;
 
     private String goodsName = "";
     private String goodsGroup = "";
     private String goodsDetail = "";
     private String picPath = "";
+
+    public static boolean isNeedReceiveTtsEnd = false;
 
     public SalesPromotionService() {
     }
@@ -115,15 +125,29 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.e(TAG, "onStartCommand");
+        initEvent();
+        initData();
+
+        mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 3000);
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void initEvent() {
+        SalesApplication.from(this).setSalesPromotionService(this);
+        SpeechManager.getInstance(this).controlHead(this, true);
         groupManager = RobotManager.getInstance(this.getApplicationContext()).getGroupInstance();
         RobotManager.getInstance(this).registerHeadKeyStateChangeListener(this);
         registerEvent();
-        initData();
+
         this.context = this;
         musicPlayer = new MusicPlayer(null);
         moveManager = new MoveManager(this);
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
+    }
 
+    private void initData() {
+        mainType = PreferencesUtils.getInt(this, SalesConstant.LAST_OPEN_ACTIVITY_ID);
         //替换默认商品词条
         List<MainItemContentBean> list = MainDataManager.getInstance(this).queryAllContent();
         if (null != list && list.size() > 0) {
@@ -134,19 +158,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             picPath = list.get(lastIndex).getSpareOne() == null ? "" : list.get(lastIndex).getSpareOne();
         }
         mPlayMode = PreferencesUtils.getInt(this, SalesConstant.PLAY_MODE, SalesConstant.CIRCLE_MODE);
-
-
-        mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
-        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 3000);
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    private void initData() {
-        mainType = PreferencesUtils.getInt(this, SalesConstant.LAST_OPEN_ACTIVITY_ID);
     }
 
     private long wordSpeed = 270;
-    private final int TTS_FINISH = 1;
+    public final int TTS_FINISH = 1;
     private final int PLAY_MORE_ACTION = 2;
     public final int VIDEO_FINISH = 3;
     public final int MUSIC_NEED_SAY = 4;
@@ -154,6 +169,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public final int SEND_CLEAR_PIC = 6;
     public final int SHOW_GOODS_PIC = 7;
     public final int START_AUTO_PLAY = 8;
+    public final int PICTURE_FINISH = 9;
     private int clearPicTime = 3000;
     public Handler mHandle = new Handler() {
         @Override
@@ -161,10 +177,17 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             super.handleMessage(msg);
             switch (msg.what) {
                 case TTS_FINISH:
+                    isNeedReceiveTtsEnd = false;
                     isTtsFinish = true;
                     isFaceFinish = true;
                     L.e(TAG, "--------------------TTS_FINISH");
                     finishAfterDoSomeThing();
+                    break;
+                case PICTURE_FINISH:
+                    if (pictureDialog != null) {
+                        pictureDialog.dismiss();
+                    }
+                    isPictureFinish = true;
                     break;
                 case PLAY_MORE_ACTION:
                     checkAction(actionList.get(currentCount));
@@ -289,13 +312,14 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                         String finalTtsString = currentBean.getOther().replace(SalesConstant.ProjectInfo.PRODUCT_NAME, goodsName).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_GROUP, goodsGroup).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_DETAIL, goodsDetail);
-                        if(!TextUtils.isEmpty(picPath)) {
+                        if (!TextUtils.isEmpty(picPath)) {
                             if (finalTtsString.contains(goodsName)) {
                                 String[] ttsStrings = finalTtsString.split(goodsName);
                                 int lastLength = 0;
                                 for (int i = 0; i < ttsStrings.length; i++) {
                                     int len = lastLength + ttsStrings[i].length();
-                                    lastLength = len + goodsName.length();L.e(TAG, "SHOW_GOODS_PIC：" + len * wordSpeed);
+                                    lastLength = len + goodsName.length();
+                                    L.e(TAG, "SHOW_GOODS_PIC：" + len * wordSpeed);
                                     mHandle.sendEmptyMessageDelayed(SHOW_GOODS_PIC, len * wordSpeed);
                                 }
                             }
@@ -307,17 +331,19 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                         } else {
                             isFaceFinish = true;
                             TtsUtils.sendTts(getApplicationContext(), finalTtsString);
+                            L.e(TAG, "startPlay sendTts：" + finalTtsString);
                         }
+                        isNeedReceiveTtsEnd = true;
 
-                        int ttsLength = finalTtsString.length();
-                        long ttsTime = ttsLength * wordSpeed;
-                        L.e(TAG, "ttsLength=" + ttsLength + "- - ttsTime=" + ttsTime);
-                        if (mHandle != null) {
-                            if (mHandle.hasMessages(TTS_FINISH)) {
-                                mHandle.removeMessages(TTS_FINISH);
-                            }
-                            mHandle.sendEmptyMessageDelayed(TTS_FINISH, ttsTime + 600);
-                        }
+//                        int ttsLength = finalTtsString.length();
+//                        long ttsTime = ttsLength * wordSpeed;
+//                        L.e(TAG, "ttsLength=" + ttsLength + "- - ttsTime=" + ttsTime);
+//                        if (mHandle != null) {
+//                            if (mHandle.hasMessages(TTS_FINISH)) {
+//                                mHandle.removeMessages(TTS_FINISH);
+//                            }
+//                            mHandle.sendEmptyMessageDelayed(TTS_FINISH, ttsTime + 600);
+//                        }
                     } else {
                         isTtsFinish = true;
                         isFaceFinish = true;
@@ -345,6 +371,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                                     pictureDialog.setContentView(currentView);
                                     pictureDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
                                     pictureDialog.show();
+                                    mHandle.sendEmptyMessageDelayed(PICTURE_FINISH, picDismissTime);
                                 }
                             }
                             isMediaFinish = true;
@@ -389,7 +416,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private void showGoodsPic(String picPath) {
         File mFile = new File(picPath);
         if (mFile.exists()) {
-            if(goodsPicDialog == null) {
+            if (goodsPicDialog == null) {
                 goodsPicDialog = new Dialog(this, R.style.Dialog_Fullscreen);
                 View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
                 ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
@@ -579,7 +606,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
      **/
     private boolean isPause = false;
 
-    private void pause() {
+    public void pause() {
         hitRobotHead();
         removeSpeechState(SalesPromotionService.this, 13);
         removeSpeechState(SalesPromotionService.this, 11);
@@ -622,6 +649,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             isPictureFinish = true;
         }
 
+        if(goodsPicDialog != null) {
+            goodsPicDialog.dismiss();
+        }
+
         if (!isActionFinish) {
             groupManager.stop();
             isActionFinish = true;
@@ -639,15 +670,26 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         speechManager.registerKeyListener(new SpeechManager.ISpeechRegisterResultListener() {
             @Override
             public void onRegisterSuccess() {
-                Log.e(TAG, "onRegisterSuccess");
+                Log.e(TAG, "registerKeyListener onRegisterSuccess");
             }
 
             @Override
             public void onRegisterFail() {
-                Log.e(TAG, "onRegisterFail");
+                Log.e(TAG, "registerKeyListener onRegisterFail");
             }
         });
         SalesSpeechProvider.setOnKeyEventListener(this);
+        speechManager.registerSpeechListener(new SpeechManager.ISpeechRegisterResultListener() {
+            @Override
+            public void onRegisterSuccess() {
+                Log.e(TAG, "registerSpeechListener onRegisterSuccess");
+            }
+
+            @Override
+            public void onRegisterFail() {
+                Log.e(TAG, "registerSpeechListener onRegisterSuccess");
+            }
+        });
         //注册面罩广播
         registerLiboard();
     }
@@ -714,8 +756,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 startPlayMode(SalesConstant.ItemType.BACK_TYPE);
                 break;
             case KeyEvent.KEYCODE_ENTER:
-                pause();
-                currentIndex--;
+                if (!isPause) {
+                    pause();
+                    currentIndex--;
+                }
                 break;
             case KeyEvent.KEYCODE_DPAD_UP:
                 moveManager.doDownExecute(keyCode);
@@ -736,6 +780,17 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
                 break;
         }
+    }
+
+    public void againPlayCurrentItem() {
+        pause();
+        currentIndex--;
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                startPlay(currentModel);
+            }
+        }, 600);
     }
 
     private void startPlayMode(int type) {
@@ -809,10 +864,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(DANCE_COMPLETE_PLAY)) {
+                unregisterReceiver(this);
                 isDanceFinish = true;
                 L.e(TAG, "--------------------com.efrobot.dance.ROBOT_DANCE_FINISH");
                 finishAfterDoSomeThing();
-                unregisterReceiver(broadcastReceiver);
             }
         }
     };
@@ -827,11 +882,15 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        SalesApplication.from(this).setSalesPromotionService(null);
+        SpeechManager.getInstance(this).controlHead(this, false);
         L.e(TAG, "onDestroy()");
         try {
             speechManager.unregisterKeyListener(this);
-            if (broadcastReceiver != null)
+            speechManager.unRegisterSpeechListener(this);
+            if (broadcastReceiver != null) {
                 unregisterReceiver(broadcastReceiver);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -843,44 +902,45 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             mHandle = null;
         }
 
+
     }
 
     @Override
     public void onRobotSateChange(int robotStateIndex, int newState) {
         if (robotStateIndex == RobotState.ROBOT_STATE_INDEX_HEAD_KEY) {
-            isPause = true;
-            if (mHandle != null)
-                mHandle.removeMessages(TTS_FINISH);
+//            isPause = true;
+//            if (mHandle != null)
+//                mHandle.removeMessages(TTS_FINISH);
+//
+//            if (!isTtsFinish) {
+//                isTtsFinish = true;
+//                isFaceFinish = true;
+//            }
 
-            if (!isTtsFinish) {
-                isTtsFinish = true;
-                isFaceFinish = true;
-            }
-
-            if (!isPictureFinish)
-                if (pictureDialog != null && pictureDialog.isShowing()) {
-                    pictureDialog.dismiss();
-                    isPictureFinish = true;
-                }
+//            if (!isPictureFinish)
+//                if (pictureDialog != null && pictureDialog.isShowing()) {
+//                    pictureDialog.dismiss();
+//                    isPictureFinish = true;
+//                }
 
             if (!isActionFinish) {
                 isActionFinish = true;
             }
 
-            if (!isMusicFinish) {
-                if (musicPlayer != null)
-                    musicPlayer.stop();
-                isMusicFinish = true;
+//            if (!isMusicFinish) {
+//                if (musicPlayer != null)
+//                    musicPlayer.stop();
+//                isMusicFinish = true;
+//
+//                musicNeedSay = false;
+//                if (mHandle != null)
+//                    mHandle.removeMessages(MUSIC_NEED_SAY);
+//            }
 
-                musicNeedSay = false;
-                if (mHandle != null)
-                    mHandle.removeMessages(MUSIC_NEED_SAY);
-            }
-
-            if (!isMediaFinish) {
-                isMediaFinish = true;
-                SalesApplication.from(this).dismissGuestVideo();
-            }
+//            if (!isMediaFinish) {
+//                isMediaFinish = true;
+//                SalesApplication.from(this).dismissGuestVideo();
+//            }
 
         }
 

@@ -31,6 +31,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private ChooseMoreAdapter groupAdapter;
     private ChooseContentAdapter contentAdapter;
     private String mContent;
+    private String picPath = "";
     private String goodsGroupStr, goodsContentStr;
     private int modelType = 0;
     private MainItemContentBean mainItemContentBean;
@@ -38,6 +39,8 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private EditText modelName, modelDetail;
 
     private TextView saveBtn;
+
+    private int id = 0;
 
 
     @Override
@@ -48,6 +51,8 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
         modelType = mainItemContentBean.getItemType();
         mContent = mainItemContentBean.getGoodsGroup();
+        picPath = mainItemContentBean.getSpareOne();
+        id = mainItemContentBean.getId();
 
         initView();
         initData();
@@ -153,10 +158,12 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 goodsContentStr = "";
             }
             MainItemContentBean mainItemContentBean = new MainItemContentBean();
+            mainItemContentBean.setId(id);
             mainItemContentBean.setGoodsName(modelName.getText().toString());
             mainItemContentBean.setGoodsGroup(goodsGroupStr);
             mainItemContentBean.setGoodsDescription(modelDetail.getText().toString());
-            MainDataManager.getInstance(this).insertContent(mainItemContentBean);
+            mainItemContentBean.setSpareOne(picPath);
+            MainDataManager.getInstance(this).updateContent(mainItemContentBean);
 
             isSuccess = true;
         } else {
