@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.adapter.ChooseGoodsAdapter;
@@ -54,6 +55,7 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
+        StatService.onResume(this);
         List<MainItemContentBean> list = MainDataManager.getInstance(this).queryAllContent();
         if (null != list && list.size() > 0) {
             MainActivity.startSelfActivity(this, null);
@@ -197,7 +199,9 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
                 Log.e("zhang", "接受广播多媒体地址=====" + path);
                 if (!TextUtils.isEmpty(path)) {
                     if ("image".equals(selectType)) {
-                        addPicPath.setText(path);
+
+                        String showPath = path.substring(path.lastIndexOf("/") + 1, path.length());
+                        addPicPath.setText(showPath);
                         delPicBtn.setVisibility(View.VISIBLE);
                         picPath = path;
                     }
@@ -224,6 +228,12 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
             Toast.makeText(FirstSettingActivity.this, "打开文件管理失败", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        StatService.onPause(this);
     }
 
     @Override

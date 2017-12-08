@@ -24,7 +24,7 @@ public class SalesConstant {
     //记录播放模式
     public static String PLAY_MODE = "play_mode";
 
-    public static String POWER_PLAY_MODE = "power_play_modE";
+    public static String POWER_PLAY_MODE = "power_play_mode";
     public static String GAME_PLAY_MODE = "game_play_mode";
     public static String HOME_PLAY_MODE = "home_play_mode";
     public static String BACK_PLAY_MODE = "back_play_mode";

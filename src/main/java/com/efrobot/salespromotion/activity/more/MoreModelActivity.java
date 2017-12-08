@@ -1,16 +1,22 @@
 package com.efrobot.salespromotion.activity.more;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
 import com.efrobot.salespromotion.activity.ModelNameBean;
@@ -42,6 +48,17 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
 
     private int id = 0;
 
+    private TextView addPicBtn, picPathTv;
+
+    private ImageView delPicImg;
+    private IntentFilter intentFilter;
+    private ResourceBroadcastReceiver resourcereceiver;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StatService.onResume(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +73,8 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
 
         initView();
         initData();
+        registerFileManager();
+
     }
 
     private void initView() {
@@ -64,6 +83,14 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         modelName = (EditText) findViewById(R.id.sales_setting_name);
         modelDetail = (EditText) findViewById(R.id.sales_setting_activity);
         findViewById(R.id.sales_more_finish_btn).setOnClickListener(this);
+
+
+        addPicBtn = (TextView) findViewById(R.id.more_add_picture_btn);
+        addPicBtn.setOnClickListener(this);
+        picPathTv = (TextView) findViewById(R.id.more_add_picture_view);
+        delPicImg = (ImageView) findViewById(R.id.more_del_picture_view);
+        delPicImg.setOnClickListener(this);
+
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -79,6 +106,12 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private void initData() {
         modelName.setText(mainItemContentBean.getGoodsName());
         modelDetail.setText(mainItemContentBean.getGoodsDescription());
+
+        if(!TextUtils.isEmpty(picPath)){
+            String showPath = picPath.substring(picPath.lastIndexOf("/") + 1, picPath.length());
+            picPathTv.setText(showPath);
+            delPicImg.setVisibility(View.VISIBLE);
+        }
 
         groupLists.add("食品");
         groupLists.add("饮料");
@@ -146,6 +179,18 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                     }
                 }
                 break;
+            case R.id.more_add_picture_btn:
+                if(TextUtils.isEmpty(picPathTv.getText())) {
+                    toAddMedia("image");
+                } else {
+                    Toast.makeText(this, "已经添加了图片,请先删除", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.more_del_picture_view:
+                picPathTv.setText("");
+                delPicImg.setVisibility(View.GONE);
+                picPath = "";
+                break;
         }
     }
 
@@ -171,5 +216,72 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         }
         isExcute = false;
         return isSuccess;
+    }
+
+    private void registerFileManager() {
+        //文件管理数据接受广播
+        intentFilter = new IntentFilter();
+        //添加过滤的Action值；
+        intentFilter.addAction("efrobot.robot.resoure");
+
+        //实例化广播监听器；
+        resourcereceiver = new ResourceBroadcastReceiver();
+
+        //将广播监听器和过滤器注册在一起；
+        registerReceiver(resourcereceiver, intentFilter);
+    }
+
+    class ResourceBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            if (intent.getAction().equals("efrobot.robot.resoure")) {
+                String path = intent.getStringExtra("path");
+                String selectType = intent.getStringExtra("type");
+                Log.e("zhang", "接受广播多媒体地址=====" + path);
+                if (!TextUtils.isEmpty(path)) {
+                    if ("image".equals(selectType)) {
+                        String shoePath = path.substring(path.lastIndexOf("/") + 1, path.length());
+                        picPathTv.setText(shoePath);
+                        delPicImg.setVisibility(View.VISIBLE);
+                        picPath = path;
+                    }
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 添加图片或视频
+     */
+    public void toAddMedia(String check) {
+        try {
+            Intent intent = new Intent("efrobot.robot.bodyshow");
+            intent.putExtra("pick_folder", true);
+            intent.putExtra("come", 1);
+            intent.putExtra("check", check);
+            startActivityForResult(intent, 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("zhang", "e=" + e.toString());
+            Toast.makeText(this, "打开文件管理失败", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        StatService.onPause(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(resourcereceiver != null) {
+            unregisterReceiver(resourcereceiver);
+        }
     }
 }

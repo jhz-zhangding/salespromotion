@@ -17,6 +17,18 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <uses-permission
         android:name="android.hardware.usb.host"
         android:required="false" />
@@ -32,6 +44,46 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- 您从百度网站获取的 APP	KEY	-->
+        <meta-data
+            android:name="BaiduMobAd_STAT_ID"
+            android:value="002d4b5375" />
+        <!-- 渠道商编号 -->
+        <meta-data
+            android:name="BaiduMobAd_CHANNEL"
+            android:value="jhz_mall" />
+        <!-- 是否开启错误日志统计，默认为 false	-->
+        <meta-data
+            android:name="BaiduMobAd_EXCEPTION_LOG"
+            android:value="true" />
+        <!-- 日志发送策略，可选值：APP_START、ONCE_A_DAY、SET_TIME_INTERVAL，默认为 APP_START	-->
+        <meta-data
+            android:name="BaiduMobAd_SEND_STRATEGY"
+            android:value="APP_START" />
+        <!-- 日志发送策略 为 SET_TIME_INTERVAL 时，需设定时间间隔(取消下行注释)。取值为 1-24 的整数，默认为 1	-->
+        <meta-data
+            android:name="BaiduMobAd_TIME_INTERVAL"
+            android:value="2" />
+        <!-- 日志仅在 wifi 网络下发送，默认为 false	-->
+        <meta-data
+            android:name="BaiduMobAd_ONLY_WIFI"
+            android:value="false"	/>
+
+
+        <!-- 是否获取基站位置信息 ,默认为 true	-->
+        <meta-data
+            android:name="BaiduMobAd_CELL_LOCATION"
+            android:value="true" />
+        <!-- 是否获取 GPS 位置信息，默认为 true	-->
+        <meta-data
+            android:name="BaiduMobAd_GPS_LOCATION"
+            android:value="true" />
+        <!-- 是否获取 WIFI 位置信息，默认为 true	-->
+        <meta-data
+            android:name="BaiduMobAd_WIFI_LOCATION"
+            android:value="true" />
+
         <activity
             android:name=".main.MainActivity"
             android:windowSoftInputMode="stateHidden" />

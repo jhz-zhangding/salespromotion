@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.efrobot.library.net:mvpnetlibrary:2.0.6'
     compile 'com.google.code.gson:gson:2.2.4'

@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.adapter.ChooseGoodsAdapter;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
@@ -35,6 +36,12 @@ public class SalesSettingActivity extends Activity implements View.OnClickListen
 
     private TextView saveBtn;
     private ChooseGoodsAdapter adapter;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StatService.onResume(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,5 +122,11 @@ public class SalesSettingActivity extends Activity implements View.OnClickListen
             isSuccess = false;
         }
         return isSuccess;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        StatService.onPause(this);
     }
 }

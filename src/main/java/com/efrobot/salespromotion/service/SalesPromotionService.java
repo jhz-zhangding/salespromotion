@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.efrobot.library.OnRobotStateChangeListener;
 import com.efrobot.library.RobotManager;
@@ -108,6 +110,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private String picPath = "";
 
     public static boolean isNeedReceiveTtsEnd = false;
+    public static boolean isUserBreak = false;
 
     public SalesPromotionService() {
     }
@@ -129,7 +132,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         initData();
 
         mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
-        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 3000);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 8000);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -157,7 +160,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             goodsDetail = list.get(lastIndex).getGoodsDescription();
             picPath = list.get(lastIndex).getSpareOne() == null ? "" : list.get(lastIndex).getSpareOne();
         }
-        mPlayMode = PreferencesUtils.getInt(this, SalesConstant.PLAY_MODE, SalesConstant.CIRCLE_MODE);
+        mPlayMode = PreferencesUtils.getInt(this, SalesConstant.POWER_PLAY_MODE, SalesConstant.CIRCLE_MODE);
     }
 
     private long wordSpeed = 270;
@@ -190,7 +193,17 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     isPictureFinish = true;
                     break;
                 case PLAY_MORE_ACTION:
-                    checkAction(actionList.get(currentCount));
+                    if (actionList.size() > 0) {
+                        if (currentCount > actionList.size() - 1) {
+                            isActionFinish = true;
+                            L.e(TAG, "--------------------ACTION_FINISH");
+                            finishAfterDoSomeThing();
+                        } else {
+                            L.i("执行动作", "currentCount = " + currentCount);
+                            checkAction(actionList.get(currentCount));
+                        }
+                    }
+
                     break;
                 case VIDEO_FINISH:
                     isMediaFinish = true;
@@ -261,6 +274,18 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private int currentModel = -1;
 
     private void startPlay(int type) {
+
+
+        if (mHandle != null && mHandle.hasMessages(SHOW_GOODS_PIC)) {
+            if (goodsPicDialog != null && goodsPicDialog.isShowing()) {
+                goodsPicDialog.dismiss();
+            }
+            mHandle.removeMessages(SHOW_GOODS_PIC);
+        }
+        if (mHandle != null && mHandle.hasMessages(START_AUTO_PLAY)) {
+            mHandle.removeMessages(START_AUTO_PLAY);
+        }
+
         isPause = false;
 //        clearAllMessage();
         switch (type) {
@@ -288,7 +313,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             isPictureFinish = true;
             isDanceFinish = true;
 
-            if (currentIndex >= lists.size()) {
+            if (currentIndex >= lists.size() || currentIndex < 0) {
                 currentIndex = 0;
             }
             L.e(TAG, "startPlay currentIndex = " + currentIndex);
@@ -422,6 +447,15 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
                 playAdPicture(adPlayerPic, mFile);
                 goodsPicDialog.setContentView(currentView);
+
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.WRAP_CONTENT | WindowManager.LayoutParams.TYPE_SYSTEM_ERROR |
+                                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | PixelFormat.TRANSPARENT);
+                lp.type = WindowManager.LayoutParams.TYPE_TOAST;
+                //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE是关键！！！！！
+                lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                goodsPicDialog.getWindow().setAttributes(lp);
+
                 goodsPicDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
                 //图片展示时间只有clearPicTime秒
             }
@@ -585,19 +619,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
         @Override
         public void onStop() {
+            groupManager.removeListener(groupTaskListener);
             L.e(TAG, "执行动作结束");
-            if (actionList.size() > 0) {
-                if (currentCount > actionList.size() - 1) {
-                    isActionFinish = true;
-                    L.e(TAG, "--------------------ACTION_FINISH");
-                    finishAfterDoSomeThing();
-                } else {
-                    L.i("执行动作", "currentCount = " + currentCount);
-                    if (mHandle != null)
-                        mHandle.sendEmptyMessage(PLAY_MORE_ACTION);
-                }
-            }
-
+            if (mHandle != null)
+                mHandle.sendEmptyMessage(PLAY_MORE_ACTION);
         }
     };
 
@@ -649,7 +674,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             isPictureFinish = true;
         }
 
-        if(goodsPicDialog != null) {
+        if (goodsPicDialog != null) {
             goodsPicDialog.dismiss();
         }
 
@@ -794,10 +819,12 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     }
 
     private void startPlayMode(int type) {
-        L.e(TAG, "startPlayMode");
+
         String mSpPlayMode = getSpByType(type);
         mPlayMode = PreferencesUtils.getInt(this, mSpPlayMode, SalesConstant.CIRCLE_MODE);
+        L.e(TAG, "startPlayMode : " + "type = " + type + "  mSpPlayMode  = " + mSpPlayMode + "  mPlayMode = " + mPlayMode);
         if (currentModel != type) {
+            isUserBreak = true;
             lists = DataManager.getInstance(this).queryItem(type, mainType);
             stopAllPlaying();
             startPlay(type);
@@ -886,6 +913,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         SpeechManager.getInstance(this).controlHead(this, false);
         L.e(TAG, "onDestroy()");
         try {
+            isNeedReceiveTtsEnd = false;
             speechManager.unregisterKeyListener(this);
             speechManager.unRegisterSpeechListener(this);
             if (broadcastReceiver != null) {

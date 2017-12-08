@@ -8,10 +8,9 @@
 
     <RelativeLayout
         android:layout_width="1000dp"
-        android:layout_height="500dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="50dp"
+        android:layout_height="550dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="70dp"
         android:background="@drawable/blue">
 
         <RelativeLayout
@@ -30,7 +29,7 @@
                 android:layout_marginTop="30dp"
                 android:text="@string/activity_text"
                 android:textColor="@color/white"
-                android:textSize="40sp"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
             <EditText
@@ -38,9 +37,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/first_product_activity_tv"
-                android:layout_marginBottom="15dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
+                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp"
                 android:layout_marginTop="15dp"
                 android:background="@color/white"
                 android:gravity="center"
@@ -101,19 +100,17 @@
             android:layout_marginBottom="85dp"
             android:layout_marginRight="15dp"
             android:background="@drawable/next_step_bg"
-            android:padding="15sp"
+            android:drawableLeft="@mipmap/next_step"
+            android:drawablePadding="3dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
             android:text="@string/next_step"
             android:textColor="@color/white"
             android:textSize="28sp" />
 
     </RelativeLayout>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="-330dp"
-        android:src="@mipmap/robot" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -126,34 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="150dp"
-            android:src="@mipmap/activity1" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="30dp"
-            android:src="@mipmap/activity2" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:src="@mipmap/activity3" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="30dp"
-            android:src="@mipmap/activity4" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:src="@mipmap/activity5" />
-
+            android:src="@mipmap/third_step_img" />
     </LinearLayout>
 
 </RelativeLayout>

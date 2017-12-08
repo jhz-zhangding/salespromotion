@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.base.utils.L;
 import com.efrobot.library.mvp.presenter.BasePresenter;
 import com.efrobot.library.mvp.utils.RobotToastUtil;
@@ -48,7 +49,6 @@ import com.efrobot.salespromotion.db.DataManager;
 import com.efrobot.salespromotion.db.ModelDataManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
 import com.efrobot.salespromotion.interfaces.IZipFileListener;
-import com.efrobot.salespromotion.setting.SalesSettingActivity;
 import com.efrobot.salespromotion.utils.DataFileUtils;
 import com.efrobot.salespromotion.utils.DisplayUtil;
 import com.efrobot.salespromotion.utils.FileUtil;
@@ -62,7 +62,6 @@ import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
 import com.efrobot.salespromotion.utils.ui.ImportDialog;
 import com.efrobot.salespromotion.utils.ui.LoadingDialog;
 import com.efrobot.salespromotion.utils.ui.StorageSelectedDialog;
-import com.j256.ormlite.stmt.query.In;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -126,6 +125,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         super.onResume();
         SalesApplication.isNeedStartService = true;
         L.e(TAG, "onResume isNeedStartService = " + SalesApplication.isNeedStartService);
+        StatService.onResume(this);
     }
 
     @Override
@@ -409,8 +409,13 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 break;
             case R.id.main_more_model:
                 //进入模板页面
-                Intent intent1 = new Intent(this, MoreModelActivity.class);
-                startActivityForResult(intent1, 1);
+                boolean isImport = PreferencesUtils.getBoolean(this, ISIMPORT, false);
+                if(isImport) {
+                    Intent intent1 = new Intent(this, MoreModelActivity.class);
+                    startActivityForResult(intent1, 1);
+                } else {
+                    Toast.makeText(MainActivity.this, "请先等候数据初始化", Toast.LENGTH_SHORT).show();
+                }
 
                 break;
 //            case R.id.main_create_model_data:
@@ -663,29 +668,29 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                                             if (mfilePath.contains("food")) {
                                                 modelContentBean.setModelName("食品促销模版");
                                                 modelContentBean.setModelType(0);
-                                                if (mainItemContentBean.getGoodsGroup().equals("食品")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
                                             } else if (mfilePath.contains("drink")) {
                                                 modelContentBean.setModelName("饮料促销模版");
                                                 modelContentBean.setModelType(1);
-                                                if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
+
                                             } else if (mfilePath.contains("daily")) {
                                                 modelContentBean.setModelName("日化促销模版");
                                                 modelContentBean.setModelType(2);
-                                                if (mainItemContentBean.getGoodsGroup().equals("日化")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
                                             } else if (mfilePath.contains("other")) {
                                                 modelContentBean.setModelName("其他促销模版");
                                                 modelContentBean.setModelType(3);
-                                                if (mainItemContentBean.getGoodsGroup().equals("其他")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
                                             }
                                             ModelDataManager.getInstance(MainActivity.this).insertContent(modelContentBean);
+
+                                            if (mainItemContentBean.getGoodsGroup().equals("食品")) {
+                                                dataManager.insertContentByResult(itemsContentBean);
+                                            } else if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
+                                                dataManager.insertContentByResult(itemsContentBean);
+                                            } else if (mainItemContentBean.getGoodsGroup().equals("日化")) {
+                                                dataManager.insertContentByResult(itemsContentBean);
+                                            } else if (mainItemContentBean.getGoodsGroup().equals("其他")) {
+                                                dataManager.insertContentByResult(itemsContentBean);
+                                            }
+
                                             if (!modelNameDataManager.queryModelNameExits(modelContentBean.getModelName())) {
                                                 modelNameDataManager.insertContent(new ModelNameBean(modelContentBean.getModelName(), modelContentBean.getModelType()));
                                             }
@@ -836,7 +841,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private String getSpByType(int currentType) {
         String playModeTypeSp = "";
-        if (currentType == SalesConstant.ItemType.BACK_TYPE) {
+        if (currentType == SalesConstant.ItemType.POWER_TYPE) {
             playModeTypeSp = SalesConstant.POWER_PLAY_MODE;
         } else if (currentType == SalesConstant.ItemType.GAME_TYPE) {
             playModeTypeSp = SalesConstant.GAME_PLAY_MODE;
@@ -910,6 +915,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         super.onPause();
         SalesApplication.isNeedStartService = false;
         L.e(TAG, "onPause isNeedStartService = " + SalesApplication.isNeedStartService);
+        StatService.onPause(this);
     }
 
     @Override

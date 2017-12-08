@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.DbHelper;
@@ -34,6 +35,9 @@ public class SalesApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        StatService.setDebugOn(true);
+
         instance = this;
         PreferencesUtils.putInt(this, SalesConstant.GAME_PLAY_MODE, SalesConstant.ORDER_MODE);
         PreferencesUtils.putInt(this, SalesConstant.HOME_PLAY_MODE, SalesConstant.ORDER_MODE);

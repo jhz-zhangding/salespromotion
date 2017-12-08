@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.baidu.mobstat.StatService;
 import com.efrobot.library.mvp.utils.L;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
@@ -240,6 +241,12 @@ public class AddBodyShowView extends SalesBaseActivity<AddBodyShowPresenter> imp
     private String goodsNameStr = "";
     private String goodsGroupStr = "";
     private String goodsDetailStr = "";
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StatService.onResume(this);
+    }
 
     @Override
     protected void onViewInit() {
@@ -1350,6 +1357,11 @@ public class AddBodyShowView extends SalesBaseActivity<AddBodyShowPresenter> imp
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        StatService.onPause(this);
+    }
 
     //    /**
 //     * 设置图片和名称
