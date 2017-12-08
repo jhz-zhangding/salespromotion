@@ -5,14 +5,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +29,8 @@ import com.efrobot.salespromotion.adapter.ChooseGoodsAdapter;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
 import com.efrobot.salespromotion.main.MainActivity;
+import com.efrobot.salespromotion.utils.BitmapUtils;
+import com.efrobot.salespromotion.utils.DisplayUtil;
 import com.efrobot.salespromotion.utils.PreferencesUtils;
 
 import java.util.ArrayList;
@@ -42,15 +50,15 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
 
     private EditText detailEt;
 
-    private String goodsNameStr = "", goodsGroupStr = "", goodsDescriptionStr = "", picPath = "";
+    private String goodsNameStr = "", goodsGroupStr = "", goodsDescriptionStr = "";
 
     private String mContent = "";
 
-    private TextView addPicBtn, addPicPath;
-
-    private ImageView delPicBtn;
     private IntentFilter intentFilter;
     private ResourceBroadcastReceiver resourcereceiver;
+
+    private List<String> picPaths = new ArrayList<>();
+    private LinearLayout container;
 
     @Override
     protected void onResume() {
@@ -72,18 +80,14 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
         page1 = findViewById(R.id.page_view_1);
         page2 = findViewById(R.id.page_view_2);
         page3 = findViewById(R.id.page_view_3);
+        container = (LinearLayout) findViewById(R.id.picture_container);
         stepOneFinish = (TextView) findViewById(R.id.first_next_btn_1);
         stepOneFinish.setOnClickListener(this);
         stepTwoFinish = (TextView) findViewById(R.id.first_next_btn_2);
         stepTwoFinish.setOnClickListener(this);
         stepThreeFinish = (TextView) findViewById(R.id.first_next_btn_3);
         stepThreeFinish.setOnClickListener(this);
-
-        addPicBtn = (TextView) findViewById(R.id.add_picture_btn);
-        addPicBtn.setOnClickListener(this);
-        addPicPath = (TextView) findViewById(R.id.add_picture_view);
-        delPicBtn = (ImageView) findViewById(R.id.del_picture_view);
-        delPicBtn.setOnClickListener(this);
+        findViewById(R.id.add_picture_btn).setOnClickListener(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.sales_first_group_list);
         groupLists.add("食品");
@@ -120,6 +124,45 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
             goodsGroupStr = danceName;
         }
     };
+
+    private final int SHOW_PIC = 1;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case SHOW_PIC:
+                    addPicChildView(container, msg.obj.toString());
+                    break;
+            }
+        }
+    };
+
+    private void addPicChildView(final LinearLayout parent, final String path) {
+        final RelativeLayout relativeLayout = new RelativeLayout(this);
+        relativeLayout.setGravity(Gravity.TOP | Gravity.RIGHT);
+
+        final ImageView imageView = new ImageView(this);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(DisplayUtil.dipToPixel(this, 100), DisplayUtil.dipToPixel(this, 100));
+        imageView.setLayoutParams(layoutParams);
+        Bitmap bitmap = BitmapUtils.getimage(path);
+        imageView.setImageBitmap(bitmap);
+        relativeLayout.addView(imageView);
+
+        ImageView delImageView = new ImageView(this);
+        delImageView.setImageResource(R.mipmap.del);
+        delImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageView.setImageBitmap(null);
+                parent.removeView(relativeLayout);
+                picPaths.remove(path);
+            }
+        });
+
+        relativeLayout.addView(delImageView);
+        parent.addView(relativeLayout);
+    }
 
     @Override
     public void onClick(View v) {
@@ -158,16 +201,11 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
                 }
                 break;
             case R.id.add_picture_btn:
-                if(TextUtils.isEmpty(addPicPath.getText())) {
-                    toAddMedia("image");
+                if (picPaths.size() > 4) {
+                    Toast.makeText(this, "最多添加5张图片,请先删除", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(FirstSettingActivity.this, "已经添加了图片", Toast.LENGTH_SHORT).show();
+                    toAddMedia("image");
                 }
-                break;
-            case R.id.del_picture_view:
-                addPicPath.setText("");
-                delPicBtn.setVisibility(View.GONE);
-                picPath = "";
                 break;
         }
     }
@@ -179,7 +217,19 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
             mainItemContentBean.setGoodsName(goodsNameStr);
             mainItemContentBean.setGoodsGroup(goodsGroupStr);
             mainItemContentBean.setGoodsDescription(goodsDescriptionStr);
-            mainItemContentBean.setSpareOne(picPath);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < picPaths.size(); i++) {
+                if (i < picPaths.size() - 1) {
+                    sb.append(picPaths.get(i)).append("@#");
+                } else {
+                    sb.append(picPaths.get(i));
+                }
+            }
+            String mSb = sb.toString();
+            Log.e("mainItemContentBean", "mSb = " + mSb);
+            mainItemContentBean.setSpareOne(mSb);
+
             MainDataManager.getInstance(this).insertContent(mainItemContentBean);
             isSuccess = true;
         } else {
@@ -199,11 +249,11 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
                 Log.e("zhang", "接受广播多媒体地址=====" + path);
                 if (!TextUtils.isEmpty(path)) {
                     if ("image".equals(selectType)) {
-
-                        String showPath = path.substring(path.lastIndexOf("/") + 1, path.length());
-                        addPicPath.setText(showPath);
-                        delPicBtn.setVisibility(View.VISIBLE);
-                        picPath = path;
+                        picPaths.add(path);
+                        Message message = handler.obtainMessage();
+                        message.what = SHOW_PIC;
+                        message.obj = path;
+                        handler.sendMessage(message);
                     }
                 }
             }

@@ -223,26 +223,23 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/textsize_26" />
 
-                <FrameLayout
+                <EditText
+                    android:id="@+id/add_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginLeft="35dp"
                     android:layout_marginRight="35dp"
-                    android:layout_marginTop="@dimen/padding_10">
-
-                    <EditText
-                        android:id="@+id/add_edit_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/white_border_bg"
-                        android:hint="请输入字符"
-                        android:minHeight="250dp"
-                        android:padding="@dimen/padding_15"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/textsize_26" />
-
-                </FrameLayout>
+                    android:layout_marginTop="@dimen/padding_10"
+                    android:background="@drawable/white_border_bg"
+                    android:hint="请输入字符"
+                    android:minHeight="250dp"
+                    android:maxHeight="350dp"
+                    android:padding="@dimen/padding_15"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/textsize_26"
+                    android:scrollbars="vertical"
+                    />
 
                 <LinearLayout
                     android:id="@+id/add_edit_person_name_ll"
@@ -298,18 +295,10 @@
                         android:paddingRight="15dp"
                         android:text=""
                         android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:maxHeight="100dp"
+                        />
                 </LinearLayout>
-                <!--<ListView-->
-                <!--android:id="@+id/add_prepare_say_words_lv"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="35dp"-->
-                <!--android:layout_marginRight="35dp"-->
-                <!--android:divider="#00000000"-->
-                <!--android:dividerHeight="5dp"-->
-                <!--/>-->
-
             </LinearLayout>
         </ScrollView>
 

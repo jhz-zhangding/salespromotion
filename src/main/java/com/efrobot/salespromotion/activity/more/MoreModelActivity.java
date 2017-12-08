@@ -5,14 +5,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +29,8 @@ import com.efrobot.salespromotion.activity.ModelNameBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
+import com.efrobot.salespromotion.utils.BitmapUtils;
+import com.efrobot.salespromotion.utils.DisplayUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +45,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private ChooseMoreAdapter groupAdapter;
     private ChooseContentAdapter contentAdapter;
     private String mContent;
-    private String picPath = "";
+    private List<String> picPaths = new ArrayList<>();
     private String goodsGroupStr, goodsContentStr;
     private int modelType = 0;
     private MainItemContentBean mainItemContentBean;
@@ -48,11 +56,10 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
 
     private int id = 0;
 
-    private TextView addPicBtn, picPathTv;
-
-    private ImageView delPicImg;
     private IntentFilter intentFilter;
     private ResourceBroadcastReceiver resourcereceiver;
+    private LinearLayout container;
+    private String picPath;
 
     @Override
     protected void onResume() {
@@ -70,6 +77,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         mContent = mainItemContentBean.getGoodsGroup();
         picPath = mainItemContentBean.getSpareOne();
         id = mainItemContentBean.getId();
+        container = (LinearLayout) findViewById(R.id.picture_container);
 
         initView();
         initData();
@@ -83,13 +91,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         modelName = (EditText) findViewById(R.id.sales_setting_name);
         modelDetail = (EditText) findViewById(R.id.sales_setting_activity);
         findViewById(R.id.sales_more_finish_btn).setOnClickListener(this);
-
-
-        addPicBtn = (TextView) findViewById(R.id.more_add_picture_btn);
-        addPicBtn.setOnClickListener(this);
-        picPathTv = (TextView) findViewById(R.id.more_add_picture_view);
-        delPicImg = (ImageView) findViewById(R.id.more_del_picture_view);
-        delPicImg.setOnClickListener(this);
+        findViewById(R.id.more_add_picture_btn).setOnClickListener(this);
 
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4);
@@ -107,11 +109,25 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         modelName.setText(mainItemContentBean.getGoodsName());
         modelDetail.setText(mainItemContentBean.getGoodsDescription());
 
-        if(!TextUtils.isEmpty(picPath)){
-            String showPath = picPath.substring(picPath.lastIndexOf("/") + 1, picPath.length());
-            picPathTv.setText(showPath);
-            delPicImg.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(picPath)) {
+            if (picPath.contains("@#")) {
+                String[] strings = picPath.split("@#");
+                for (int i = 0; i < strings.length; i++) {
+                    picPaths.add(strings[i]);
+                    Message message = handler.obtainMessage();
+                    message.what = SHOW_PIC;
+                    message.obj = strings[i];
+                    handler.sendMessage(message);
+                }
+            } else {
+                picPaths.add(picPath);
+                Message message = handler.obtainMessage();
+                message.what = SHOW_PIC;
+                message.obj = picPath;
+                handler.sendMessage(message);
+            }
         }
+
 
         groupLists.add("食品");
         groupLists.add("饮料");
@@ -163,6 +179,20 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
 
     boolean isExcute = false;
 
+
+    private final int SHOW_PIC = 1;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case SHOW_PIC:
+                    addPicChildView(container, msg.obj.toString());
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -180,16 +210,11 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 }
                 break;
             case R.id.more_add_picture_btn:
-                if(TextUtils.isEmpty(picPathTv.getText())) {
-                    toAddMedia("image");
+                if (picPaths.size() > 4) {
+                    Toast.makeText(this, "最多添加5张图片,请先删除", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "已经添加了图片,请先删除", Toast.LENGTH_SHORT).show();
+                    toAddMedia("image");
                 }
-                break;
-            case R.id.more_del_picture_view:
-                picPathTv.setText("");
-                delPicImg.setVisibility(View.GONE);
-                picPath = "";
                 break;
         }
     }
@@ -207,7 +232,19 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
             mainItemContentBean.setGoodsName(modelName.getText().toString());
             mainItemContentBean.setGoodsGroup(goodsGroupStr);
             mainItemContentBean.setGoodsDescription(modelDetail.getText().toString());
-            mainItemContentBean.setSpareOne(picPath);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < picPaths.size(); i++) {
+                if (i < picPaths.size() - 1) {
+                    sb.append(picPaths.get(i)).append("@#");
+                } else {
+                    sb.append(picPaths.get(i));
+                }
+            }
+            String mSb = sb.toString();
+            Log.e("mainItemContentBean", "mSb = " + mSb);
+            mainItemContentBean.setSpareOne(mSb);
+
             MainDataManager.getInstance(this).updateContent(mainItemContentBean);
 
             isSuccess = true;
@@ -242,16 +279,44 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 Log.e("zhang", "接受广播多媒体地址=====" + path);
                 if (!TextUtils.isEmpty(path)) {
                     if ("image".equals(selectType)) {
-                        String shoePath = path.substring(path.lastIndexOf("/") + 1, path.length());
-                        picPathTv.setText(shoePath);
-                        delPicImg.setVisibility(View.VISIBLE);
-                        picPath = path;
+                        picPaths.add(path);
+                        Message message = handler.obtainMessage();
+                        message.what = SHOW_PIC;
+                        message.obj = path;
+                        handler.sendMessage(message);
                     }
                 }
             }
         }
 
     }
+
+    private void addPicChildView(final LinearLayout parent, final String path) {
+        final RelativeLayout relativeLayout = new RelativeLayout(this);
+        relativeLayout.setGravity(Gravity.TOP | Gravity.RIGHT);
+
+        final ImageView imageView = new ImageView(this);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(DisplayUtil.dipToPixel(this, 100), DisplayUtil.dipToPixel(this, 100));
+        imageView.setLayoutParams(layoutParams);
+        Bitmap bitmap = BitmapUtils.getimage(path);
+        imageView.setImageBitmap(bitmap);
+        relativeLayout.addView(imageView);
+
+        ImageView delImageView = new ImageView(this);
+        delImageView.setImageResource(R.mipmap.del);
+        delImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageView.setImageBitmap(null);
+                parent.removeView(relativeLayout);
+                picPaths.remove(path);
+            }
+        });
+
+        relativeLayout.addView(delImageView);
+        parent.addView(relativeLayout);
+    }
+
 
     /**
      * 添加图片或视频
@@ -280,7 +345,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(resourcereceiver != null) {
+        if (resourcereceiver != null) {
             unregisterReceiver(resourcereceiver);
         }
     }

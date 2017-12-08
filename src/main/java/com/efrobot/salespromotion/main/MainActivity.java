@@ -1,8 +1,10 @@
 package com.efrobot.salespromotion.main;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -49,6 +51,7 @@ import com.efrobot.salespromotion.db.DataManager;
 import com.efrobot.salespromotion.db.ModelDataManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
 import com.efrobot.salespromotion.interfaces.IZipFileListener;
+import com.efrobot.salespromotion.service.SalesPromotionService;
 import com.efrobot.salespromotion.utils.DataFileUtils;
 import com.efrobot.salespromotion.utils.DisplayUtil;
 import com.efrobot.salespromotion.utils.FileUtil;
@@ -56,6 +59,7 @@ import com.efrobot.salespromotion.utils.JsonUtil;
 import com.efrobot.salespromotion.utils.PreferencesUtils;
 import com.efrobot.salespromotion.utils.ThreadManager;
 import com.efrobot.salespromotion.utils.TimeUtil;
+import com.efrobot.salespromotion.utils.TtsUtils;
 import com.efrobot.salespromotion.utils.ZipUtil;
 import com.efrobot.salespromotion.utils.ZipUtils;
 import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
@@ -71,6 +75,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends SalesBaseActivity<MainPresenter> implements IMain, AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -126,6 +132,10 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         SalesApplication.isNeedStartService = true;
         L.e(TAG, "onResume isNeedStartService = " + SalesApplication.isNeedStartService);
         StatService.onResume(this);
+
+        IntentFilter dynamic_filter = new IntentFilter();
+        dynamic_filter.addAction(ROBOT_MASK_CHANGE);
+        registerReceiver(lidBoardReceive, dynamic_filter);
     }
 
     @Override
@@ -177,6 +187,36 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
         mHandle.sendEmptyMessage(MSG_UNCOMPRESS_DEFAULT);
     }
+
+    public final static String ROBOT_MASK_CHANGE = "android.intent.action.MASK_CHANGED";
+    public final static String KEYCODE_MASK_ONPROGRESS = "KEYCODE_MASK_ONPROGRESS"; //开闭状态
+    public final static String KEYCODE_MASK_CLOSE = "KEYCODE_MASK_CLOSE"; //关闭面罩
+    public final static String KEYCODE_MASK_OPEN = "KEYCODE_MASK_OPEN";  //打开面罩
+    private BroadcastReceiver lidBoardReceive = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            if (ROBOT_MASK_CHANGE.equals(intent.getAction())) {
+                boolean close = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
+                boolean maskOnProgress = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
+                boolean maskOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
+                Log.i(TAG, "lidBoardReceive get data----" + "close----" + close + "  maskOnProgress----" + maskOnProgress + "  maskOpen----" + maskOpen);
+                if (close) {
+                    try {
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                Intent serviceIntent = new Intent(context, SalesPromotionService.class);
+                                context.startService(serviceIntent);
+                            }
+                        }, 2000);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
 
     private static final int LONG_TOUCH = 100005;
     private static final int MSG_BEGIN_IMPORT = 1005;
@@ -410,7 +450,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
             case R.id.main_more_model:
                 //进入模板页面
                 boolean isImport = PreferencesUtils.getBoolean(this, ISIMPORT, false);
-                if(isImport) {
+                if (isImport) {
                     Intent intent1 = new Intent(this, MoreModelActivity.class);
                     startActivityForResult(intent1, 1);
                 } else {
@@ -668,29 +708,29 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                                             if (mfilePath.contains("food")) {
                                                 modelContentBean.setModelName("食品促销模版");
                                                 modelContentBean.setModelType(0);
+                                                if (mainItemContentBean.getGoodsGroup().equals("食品")) {
+                                                    dataManager.insertContentByResult(itemsContentBean);
+                                                }
                                             } else if (mfilePath.contains("drink")) {
                                                 modelContentBean.setModelName("饮料促销模版");
                                                 modelContentBean.setModelType(1);
-
+                                                if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
+                                                    dataManager.insertContentByResult(itemsContentBean);
+                                                }
                                             } else if (mfilePath.contains("daily")) {
                                                 modelContentBean.setModelName("日化促销模版");
                                                 modelContentBean.setModelType(2);
+                                                if (mainItemContentBean.getGoodsGroup().equals("日化")) {
+                                                    dataManager.insertContentByResult(itemsContentBean);
+                                                }
                                             } else if (mfilePath.contains("other")) {
                                                 modelContentBean.setModelName("其他促销模版");
                                                 modelContentBean.setModelType(3);
+                                                if (mainItemContentBean.getGoodsGroup().equals("其他")) {
+                                                    dataManager.insertContentByResult(itemsContentBean);
+                                                }
                                             }
                                             ModelDataManager.getInstance(MainActivity.this).insertContent(modelContentBean);
-
-                                            if (mainItemContentBean.getGoodsGroup().equals("食品")) {
-                                                dataManager.insertContentByResult(itemsContentBean);
-                                            } else if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
-                                                dataManager.insertContentByResult(itemsContentBean);
-                                            } else if (mainItemContentBean.getGoodsGroup().equals("日化")) {
-                                                dataManager.insertContentByResult(itemsContentBean);
-                                            } else if (mainItemContentBean.getGoodsGroup().equals("其他")) {
-                                                dataManager.insertContentByResult(itemsContentBean);
-                                            }
-
                                             if (!modelNameDataManager.queryModelNameExits(modelContentBean.getModelName())) {
                                                 modelNameDataManager.insertContent(new ModelNameBean(modelContentBean.getModelName(), modelContentBean.getModelType()));
                                             }
@@ -916,6 +956,9 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         SalesApplication.isNeedStartService = false;
         L.e(TAG, "onPause isNeedStartService = " + SalesApplication.isNeedStartService);
         StatService.onPause(this);
+        if (lidBoardReceive != null) {
+            unregisterReceiver(lidBoardReceive);
+        }
     }
 
     @Override

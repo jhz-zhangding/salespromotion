@@ -112,6 +112,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public static boolean isNeedReceiveTtsEnd = false;
     public static boolean isUserBreak = false;
 
+    private List<String> picPaths = new ArrayList<>();
+    private int picIndex = 0;
+
     public SalesPromotionService() {
     }
 
@@ -128,11 +131,17 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.e(TAG, "onStartCommand");
+        this.context = this;
+        String robotName = RobotState.getInstance(this).getRobotName() == null ? "小虎" : RobotState.getInstance(this).getRobotName();
+        String tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
+        TtsUtils.sendTts(this, tts);
+
+
         initEvent();
         initData();
 
         mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
-        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 8000);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 6000);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -143,7 +152,6 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         RobotManager.getInstance(this).registerHeadKeyStateChangeListener(this);
         registerEvent();
 
-        this.context = this;
         musicPlayer = new MusicPlayer(null);
         moveManager = new MoveManager(this);
         audio = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
@@ -160,6 +168,18 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             goodsDetail = list.get(lastIndex).getGoodsDescription();
             picPath = list.get(lastIndex).getSpareOne() == null ? "" : list.get(lastIndex).getSpareOne();
         }
+
+        if (!TextUtils.isEmpty(picPath)) {
+            if (picPath.contains("@#")) {
+                String[] strings = picPath.split("@#");
+                for (int i = 0; i < strings.length; i++) {
+                    picPaths.add(strings[i]);
+                }
+            } else {
+                picPaths.add(picPath);
+            }
+        }
+
         mPlayMode = PreferencesUtils.getInt(this, SalesConstant.POWER_PLAY_MODE, SalesConstant.CIRCLE_MODE);
     }
 
@@ -230,7 +250,14 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     if (goodsPicDialog != null) {
                         goodsPicDialog.dismiss();
                     }
-                    showGoodsPic(picPath);
+                    if (picPaths.size() > 0) {
+                        if (picIndex >= picPaths.size()) {
+                            picIndex = 0;
+                        }
+                        String mCurrentPath = picPaths.get(picIndex);
+                        showGoodsPic(mCurrentPath);
+                        picIndex++;
+                    }
                     break;
                 case START_AUTO_PLAY:
                     startPlayMode(SalesConstant.ItemType.POWER_TYPE);
@@ -441,24 +468,22 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private void showGoodsPic(String picPath) {
         File mFile = new File(picPath);
         if (mFile.exists()) {
-            if (goodsPicDialog == null) {
-                goodsPicDialog = new Dialog(this, R.style.Dialog_Fullscreen);
-                View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
-                ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
-                playAdPicture(adPlayerPic, mFile);
-                goodsPicDialog.setContentView(currentView);
+            goodsPicDialog = new Dialog(this, R.style.Dialog_Fullscreen);
+            View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
+            ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
+            playAdPicture(adPlayerPic, mFile);
+            goodsPicDialog.setContentView(currentView);
 
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
-                        WindowManager.LayoutParams.WRAP_CONTENT | WindowManager.LayoutParams.TYPE_SYSTEM_ERROR |
-                                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | PixelFormat.TRANSPARENT);
-                lp.type = WindowManager.LayoutParams.TYPE_TOAST;
-                //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE是关键！！！！！
-                lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-                goodsPicDialog.getWindow().setAttributes(lp);
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT | WindowManager.LayoutParams.TYPE_SYSTEM_ERROR |
+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | PixelFormat.TRANSPARENT);
+            lp.type = WindowManager.LayoutParams.TYPE_TOAST;
+            //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE是关键！！！！！
+            lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            goodsPicDialog.getWindow().setAttributes(lp);
 
-                goodsPicDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
-                //图片展示时间只有clearPicTime秒
-            }
+            goodsPicDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+            //图片展示时间只有clearPicTime秒
             goodsPicDialog.show();
             sendRemovePicMess();
         }

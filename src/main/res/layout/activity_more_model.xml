@@ -5,211 +5,206 @@
     android:layout_height="match_parent"
     android:background="@mipmap/main_bg">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:text="促销助手机器人"
-            android:textColor="@color/white"
-            android:textSize="36sp"
-            android:textStyle="bold" />
-
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/background"
-            android:minHeight="250dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/goods_setting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
-                android:background="#307CED"
-                android:gravity="center"
-                android:minHeight="70dp"
-                android:minWidth="170dp"
-                android:text="商品设置"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="促销助手机器人"
                 android:textColor="@color/white"
-                android:textSize="28sp" />
+                android:textSize="36sp"
+                android:textStyle="bold" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_toRightOf="@+id/goods_setting"
-                android:orientation="vertical">
+                android:layout_margin="20dp"
+                android:background="@drawable/background"
+                android:minHeight="250dp">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/goods_setting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="50dp"
-                    android:orientation="horizontal">
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:background="#307CED"
+                    android:gravity="center"
+                    android:minHeight="70dp"
+                    android:minWidth="170dp"
+                    android:text="商品设置"
+                    android:textColor="@color/white"
+                    android:textSize="28sp" />
 
-                    <TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toRightOf="@+id/goods_setting"
+                    android:orientation="vertical">
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="商品名称："
-                        android:textColor="@color/white"
-                        android:textSize="28sp" />
+                        android:layout_marginTop="50dp"
+                        android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/sales_setting_name"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="商品名称："
+                            android:textColor="@color/white"
+                            android:textSize="28sp" />
+
+                        <EditText
+                            android:id="@+id/sales_setting_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:background="@color/white"
+                            android:minHeight="40dp"
+                            android:minWidth="200dp"
+                            android:text=""
+                            android:textColor="#3d3d3d"
+                            android:textSize="20sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="50dp"
-                        android:background="@color/white"
-                        android:minHeight="40dp"
-                        android:minWidth="200dp"
-                        android:text=""
-                        android:textColor="#3d3d3d"
-                        android:textSize="20sp" />
+                        android:layout_marginTop="30dp"
+                        android:orientation="horizontal"
 
-                    <TextView
-                        android:id="@+id/more_add_picture_btn"
+                        >
+
+                        <TextView
+                            android:id="@+id/more_add_picture_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/next_step_bg"
+                            android:gravity="center"
+                            android:minHeight="50dp"
+                            android:minWidth="100dp"
+                            android:padding="15dp"
+                            android:text="添加图片"
+                            android:textColor="@color/white"
+                            android:textSize="24sp" />
+
+                        <LinearLayout
+                            android:id="@+id/picture_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:orientation="horizontal" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/next_step_bg"
+                        android:layout_marginBottom="50dp"
+                        android:layout_marginTop="30dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="促销活动："
+                            android:textColor="@color/white"
+                            android:textSize="28sp" />
+
+                        <EditText
+                            android:id="@+id/sales_setting_activity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:background="@color/white"
+                            android:minHeight="100dp"
+                            android:minWidth="500dp"
+                            android:text=""
+                            android:textColor="#3d3d3d"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/background"
+                android:minHeight="250dp">
+
+                <TextView
+                    android:id="@+id/goods_model"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:background="#307CED"
+                    android:gravity="center"
+                    android:minHeight="70dp"
+                    android:minWidth="170dp"
+                    android:text="促销模版"
+                    android:textColor="@color/white"
+                    android:textSize="28sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toRightOf="@+id/goods_model"
+                    android:orientation="vertical">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/sales_more_group_list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="30dp"
-                        android:gravity="center"
-                        android:minHeight="50dp"
-                        android:minWidth="100dp"
-                        android:padding="15dp"
-                        android:text="添加图片"
-                        android:textColor="@color/white"
-                        android:textSize="24sp" />
+                        android:layout_marginTop="20dp"
+                        android:horizontalSpacing="20dp"
+                        android:numColumns="4"
+                        android:verticalSpacing="20dp" />
 
-                    <TextView
-                        android:id="@+id/more_add_picture_view"
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/sales_more_group_content_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="3dp"
-                        android:gravity="center"
-                        android:minHeight="50dp"
-                        android:minWidth="100dp"
-                        android:text=""
-                        android:textColor="@color/white"
-                        android:textSize="24sp" />
-
-                    <ImageView
-                        android:id="@+id/more_del_picture_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:src="@mipmap/del"
-                        android:visibility="gone" />
-
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginTop="10dp"
+                        android:horizontalSpacing="20dp"
+                        android:numColumns="4"
+                        android:verticalSpacing="20dp" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="50dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="50dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="促销活动："
-                        android:textColor="@color/white"
-                        android:textSize="28sp" />
-
-                    <EditText
-                        android:id="@+id/sales_setting_activity"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="50dp"
-                        android:background="@color/white"
-                        android:minHeight="100dp"
-                        android:minWidth="500dp"
-                        android:text=""
-                        android:textColor="#3d3d3d"
-                        android:textSize="20sp" />
-                </LinearLayout>
-
-            </LinearLayout>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/background"
-            android:minHeight="250dp">
-
-            <TextView
-                android:id="@+id/goods_model"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
-                android:background="#307CED"
-                android:gravity="center"
-                android:minHeight="70dp"
-                android:minWidth="170dp"
-                android:text="促销模版"
-                android:textColor="@color/white"
-                android:textSize="28sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_toRightOf="@+id/goods_model"
-                android:orientation="vertical">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/sales_more_group_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="20dp"
-                    android:horizontalSpacing="20dp"
-                    android:numColumns="4"
-                    android:verticalSpacing="20dp" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/sales_more_group_content_list"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="10dp"
-                    android:horizontalSpacing="20dp"
-                    android:numColumns="4"
-                    android:verticalSpacing="20dp" />
-            </LinearLayout>
-        </RelativeLayout>
-    </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/sales_more_finish_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="170dp"
-        android:minHeight="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/button_bg"
         android:gravity="center"
+        android:minHeight="50dp"
+        android:minWidth="170dp"
         android:text="完成设置"
         android:textColor="@color/white"
-        android:textSize="28sp"
-        android:background="@drawable/button_bg"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        />
+        android:textSize="28sp" />
 
 </RelativeLayout>

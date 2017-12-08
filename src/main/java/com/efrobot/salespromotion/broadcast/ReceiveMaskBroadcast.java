@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.efrobot.library.RobotManager;
 import com.efrobot.library.RobotState;
 import com.efrobot.library.mvp.utils.L;
 import com.efrobot.salespromotion.SalesApplication;
@@ -30,33 +31,33 @@ public class ReceiveMaskBroadcast extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        L.i("ReceiveMaskBroadcast", "lidBoardReceive");
-        if (ROBOT_MASK_CHANGE.equals(intent.getAction())) {
-            boolean isOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
-            boolean isOpening = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
-            boolean isClose = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
-
-            String robotName =  RobotState.getInstance(context).getRobotName() == null ? "小虎" :  RobotState.getInstance(context).getRobotName();
-            tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
-
-            if (isClose) {
-                boolean isNeedOpen = SalesApplication.isNeedStartService;
-                if(isNeedOpen) {
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            TtsUtils.sendTts(context, tts);
-                            startSalesService(context, 0);
-                        }
-                    },tts.length() * 200);
-
-                }
-            }
-
-        } else if(Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            L.e("ReceiveMaskBroadcast", "boot_completed");
-
-        }
+//        L.i("ReceiveMaskBroadcast", "lidBoardReceive");
+//        if (ROBOT_MASK_CHANGE.equals(intent.getAction())) {
+//            boolean isOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
+//            boolean isOpening = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
+//            boolean isClose = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
+//
+//            String robotName = RobotState.getInstance(context).getRobotName() == null ? "小虎" : RobotState.getInstance(context).getRobotName();
+//            tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
+//
+//            if (isClose) {
+//                boolean isNeedOpen = SalesApplication.isNeedStartService;
+//                if (isNeedOpen) {
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            TtsUtils.sendTts(context, tts);
+//                            startSalesService(context, 0);
+//                        }
+//                    }, tts.length() * 200);
+//
+//                }
+//            }
+//
+//        } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+//            L.e("ReceiveMaskBroadcast", "boot_completed");
+//
+//        }
     }
 
     private void startSalesService(final Context context, long delay) {
