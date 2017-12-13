@@ -365,6 +365,11 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private void deleteModel(String modelName) {
         ModelNameDataManager.getInstance(MoreModelActivity.this).deleteContentByName(modelName);
         ModelContentManager.getInstance(MoreModelActivity.this).deleteContentByModelName(modelName);
+        //更新模版列表
+        contentLists = ModelNameDataManager.getInstance(MoreModelActivity.this).queryListByType(modelType);
+        if (contentAdapter != null) {
+            contentAdapter.updateContent(contentLists, goodsContentStr);
+        }
     }
 
     private void registerFileManager() {
@@ -460,5 +465,14 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         if (resourcereceiver != null) {
             unregisterReceiver(resourcereceiver);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        //返回按键时需要更新一下主页面数据
+        finishByResult();
+
+        super.onBackPressed();
     }
 }
