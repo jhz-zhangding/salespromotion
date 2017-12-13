@@ -215,6 +215,7 @@
                         />
 
                     <TextView
+                        android:id="@+id/rlDelete"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/more_button_style"
@@ -222,6 +223,7 @@
                         />
 
                     <TextView
+                        android:id="@+id/rlCreate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/more_button_style"

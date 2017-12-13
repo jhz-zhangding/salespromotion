@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,9 +26,9 @@ import android.widget.Toast;
 import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
+import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.bean.ModelNameBean;
-import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
 import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
@@ -35,6 +36,9 @@ import com.efrobot.salespromotion.interfaces.ImportEvent;
 import com.efrobot.salespromotion.utils.BitmapUtils;
 import com.efrobot.salespromotion.utils.DisplayUtil;
 import com.efrobot.salespromotion.utils.ImportAndExportUtils;
+import com.efrobot.salespromotion.utils.PreferencesUtils;
+import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
+import com.efrobot.salespromotion.utils.ui.EditContentDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +101,8 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
 
         findViewById(R.id.rlImport).setOnClickListener(this);
         findViewById(R.id.rlExport).setOnClickListener(this);
+        findViewById(R.id.rlDelete).setOnClickListener(this);
+        findViewById(R.id.rlCreate).setOnClickListener(this);
     }
 
     private void initView() {
@@ -155,7 +161,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         //模板列表
         modelType = getTypeByName(mContent);
         contentLists = ModelNameDataManager.getInstance(this).queryListByType(modelType);
-        goodsContentStr = contentLists.get(0).getModelName();
+        goodsContentStr = currentModelName;
         contentAdapter = new ChooseContentAdapter(contentLists, onChooseContentAdapterItemListener, goodsContentStr);
         contentRecylerView.setAdapter(contentAdapter);
     }
@@ -167,7 +173,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
             goodsGroupStr = danceName;
             modelType = getTypeByName(danceName);
             contentLists = ModelNameDataManager.getInstance(MoreModelActivity.this).queryListByType(modelType);
-            goodsContentStr = contentLists.get(0).getModelName();
+//            goodsContentStr = contentLists.get(0).getModelName();
             if (contentAdapter != null) {
                 contentAdapter.updateContent(contentLists, goodsContentStr);
             }
@@ -218,10 +224,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 if (!isExcute) {
                     isExcute = true;
                     if (save()) {
-                        Intent intent = new Intent();
-                        intent.putExtra("modelName", goodsContentStr);
-                        setResult(2, intent);
-                        finish();
+                        finishByResult();
                     } else {
                         Toast.makeText(this, "输入不能为空", Toast.LENGTH_SHORT).show();
                     }
@@ -251,6 +254,12 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 List<ModelContentBean> list = ModelContentManager.getInstance(this).queryItem(currentModelName);
                 mUtils.exportData(list);
                 break;
+            case R.id.rlDelete:
+                showDeleteDialog("是否删除此模板", currentModelName);
+                break;
+            case R.id.rlCreate:
+                showCreateDialog("");
+                break;
         }
     }
 
@@ -259,9 +268,6 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         if (!TextUtils.isEmpty(modelName.getText()) &&
                 !TextUtils.isEmpty(goodsGroupStr) &&
                 !TextUtils.isEmpty(modelDetail.getText())) {
-            if (goodsGroupStr.equals(mContent)) {
-                goodsContentStr = "";
-            }
             MainItemContentBean mainItemContentBean = new MainItemContentBean();
             mainItemContentBean.setId(id);
             mainItemContentBean.setGoodsName(modelName.getText().toString());
@@ -288,6 +294,77 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         }
         isExcute = false;
         return isSuccess;
+    }
+
+    /**
+     * 新建模板提示框
+     */
+    private void showCreateDialog(String content) {
+        final EditContentDialog dialog = new EditContentDialog(this, -1);
+        dialog.setMessage(content);
+        dialog.setCancleButton(this.getString(R.string.cancel), new EditContentDialog.IButtonOnClickLister() {
+            @Override
+            public void onClickLister() {
+                dialog.dismiss();
+            }
+        });
+        dialog.setSubmitButton(this.getString(R.string.confirm), new EditContentDialog.IButtonOnClickLister() {
+            @Override
+            public void onClickLister() {
+                String result = dialog.getEditTextContent();
+
+                if (!TextUtils.isEmpty(result)) {
+                    dialog.dismiss();
+                    ModelNameBean modelNameBean = new ModelNameBean();
+                    modelNameBean.setModelName(result);
+                    modelNameBean.setModelType(modelType);
+                    ModelNameDataManager.getInstance(MoreModelActivity.this).insertContent(modelNameBean);
+                    goodsContentStr = result;
+                    finishByResult();
+                } else {
+                    Toast.makeText(MoreModelActivity.this, "模版名称不能空", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        dialog.show();
+    }
+
+    private void finishByResult() {
+        Intent intent = new Intent();
+        intent.putExtra("modelName", goodsContentStr);
+        setResult(2, intent);
+        PreferencesUtils.putString(MoreModelActivity.this, "currentModelName", goodsContentStr);
+        finish();
+    }
+
+    /**
+     * 删除模板提示框
+     */
+    private void showDeleteDialog(String content, final String mModelName) {
+        final CustomHintDialog dialog = new CustomHintDialog(this, -1);
+        dialog.setMessage(content);
+        dialog.setCancleButton(this.getString(R.string.cancel), new CustomHintDialog.IButtonOnClickLister() {
+            @Override
+            public void onClickLister() {
+                dialog.dismiss();
+            }
+        });
+        dialog.setSubmitButton(this.getString(R.string.confirm), new CustomHintDialog.IButtonOnClickLister() {
+            @Override
+            public void onClickLister() {
+                //删除模板
+                deleteModel(mModelName);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void deleteModel(String modelName) {
+        ModelNameDataManager.getInstance(MoreModelActivity.this).deleteContentByName(modelName);
+        ModelContentManager.getInstance(MoreModelActivity.this).deleteContentByModelName(modelName);
     }
 
     private void registerFileManager() {

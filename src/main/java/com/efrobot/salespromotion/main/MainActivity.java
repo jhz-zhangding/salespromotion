@@ -227,6 +227,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     private static final int LONG_TOUCH = 100005;
     private static final int MSG_BEGIN_IMPORT = 1005;
     private static final int MSG_UNCOMPRESS_DEFAULT = 1006;
+    private static final int ALREADY_EXIST_MODEL = 1007;
     public Handler mHandle = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -313,6 +314,9 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                     break;
                 case 125:
                     RobotToastUtil.getInstance(getContext()).showToast("正在初始化数据中，请稍候");
+                    break;
+                case ALREADY_EXIST_MODEL:
+                    RobotToastUtil.getInstance(getContext()).showToast("该模板已经存在");
                     break;
             }
         }
@@ -722,6 +726,15 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                             //多媒体文件复制成功，开始插库
                             List<ModelContentBean> list = JsonUtil.getListFromJsonStr(json);
                             if (list != null) {
+
+                                if (list.size() > 0) {
+                                    String tModeName = list.get(0).getModelName();
+                                    if (modelNameDataManager.queryModelNameExits(tModeName)) {
+                                        mHandle.sendEmptyMessage(ALREADY_EXIST_MODEL);
+                                        return;
+                                    }
+                                }
+
                                 String mfilePath = mList.get(mCurrentNum);
                                 L.e(TAG, "uncompress isSuccess = " + " filePath=" + filePath);
                                 Boolean isImport = PreferencesUtils.getBoolean(MainActivity.this, ISIMPORT, false);
@@ -952,9 +965,9 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
             if (modelName != null && !TextUtils.isEmpty(modelName)) {
                 currentModelName = modelName;
                 PreferencesUtils.putString(MainActivity.this, "currentModelName", currentModelName);
+                updateAdapterData();
+                updateTitle();
             }
-            updateAdapterData();
-            updateTitle();
         }
     }
 

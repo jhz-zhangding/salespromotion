@@ -396,6 +396,17 @@ public class ModelContentManager {
     }
 
     /**
+     * 根据modelName删除某个项目下的某个内容
+     *
+     * @param modelName
+     */
+    public void deleteContentByModelName(String modelName) {
+        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
+        db.delete(CONTENT_TABLE, "modelName = ? ", new String[]{modelName + ""});
+        closDb(db);
+    }
+
+    /**
      * 数据库媒体文件数据
      *
      * @param

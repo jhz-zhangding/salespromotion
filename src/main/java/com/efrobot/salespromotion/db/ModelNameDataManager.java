@@ -201,4 +201,15 @@ public class ModelNameDataManager {
         closDb(db);
     }
 
+    /**
+     * 根据id删除某个项目下的某个内容
+     *
+     * @param modelName
+     */
+    public void deleteContentByName(String modelName) {
+        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
+        db.delete(CONTENT_TABLE, "modelName = ? ", new String[]{modelName + ""});
+        closDb(db);
+    }
+
 }
