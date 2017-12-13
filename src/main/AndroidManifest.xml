@@ -119,7 +119,7 @@
             android:name=".setting.SalesSettingActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".activity.more.MoreModelActivity"
+            android:name=".activity.MoreModelActivity"
             android:windowSoftInputMode="stateHidden" />
     </application>
 

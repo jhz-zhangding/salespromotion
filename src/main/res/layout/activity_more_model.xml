@@ -144,6 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/background"
                 android:minHeight="250dp">
 
@@ -188,6 +189,49 @@
                         android:numColumns="4"
                         android:verticalSpacing="20dp" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="15dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/rlImport"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/more_button_style"
+                        android:text="导入"
+                        />
+
+                    <TextView
+                        android:id="@+id/rlExport"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/more_button_style"
+                        android:text="导出"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/more_button_style"
+                        android:text="删除"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/more_button_style"
+                        android:text="新建"
+                        />
+
+
+
+                </LinearLayout>
+
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>

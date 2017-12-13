@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.provider.SalesProvider;
 

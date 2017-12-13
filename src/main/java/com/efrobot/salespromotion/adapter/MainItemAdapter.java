@@ -12,10 +12,9 @@ import android.widget.TextView;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
+import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
-import com.efrobot.salespromotion.db.DataManager;
-import com.efrobot.salespromotion.db.MainDataManager;
+import com.efrobot.salespromotion.db.ModelContentManager;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class MainItemAdapter extends BaseAdapter {
 
     private Context mContext;
 
-    private List<ItemsContentBean> mList;
+    private List<ModelContentBean> mList;
 
     private boolean isShowDeleteBtn = false;
 
@@ -40,7 +39,7 @@ public class MainItemAdapter extends BaseAdapter {
     private String mediaStr = "";
     private String danceStr = "";
 
-    public MainItemAdapter(Context context, List<ItemsContentBean> list) {
+    public MainItemAdapter(Context context, List<ModelContentBean> list) {
         this.mContext = context;
         this.mList = list;
         setProjectInfo();
@@ -54,7 +53,7 @@ public class MainItemAdapter extends BaseAdapter {
         this.goodsDetailStr = mainItemContentBean.getGoodsDescription() == null ? "" : mainItemContentBean.getGoodsDescription();
     }
 
-    public void updateSourceData(List<ItemsContentBean> list) {
+    public void updateSourceData(List<ModelContentBean> list) {
         this.mList = list;
         setProjectInfo();
         notifyDataSetChanged();
@@ -134,7 +133,7 @@ public class MainItemAdapter extends BaseAdapter {
             viewHolder.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DataManager.getInstance(mContext).deleteContentById(mList.get(position).getId());
+                    ModelContentManager.getInstance(mContext).deleteContentById(mList.get(position).getId());
                     mList.remove(position);
                     notifyDataSetChanged();
                 }

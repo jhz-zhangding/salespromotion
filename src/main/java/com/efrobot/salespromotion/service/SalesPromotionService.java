@@ -21,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.efrobot.library.OnRobotStateChangeListener;
 import com.efrobot.library.RobotManager;
@@ -32,10 +31,10 @@ import com.efrobot.library.task.GroupManager;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
-import com.efrobot.salespromotion.db.DataManager;
+import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
+import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.interfaces.OnKeyEventListener;
 import com.efrobot.salespromotion.provider.SalesSpeechProvider;
 import com.efrobot.salespromotion.utils.BitmapUtils;
@@ -58,7 +57,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
     private static final String TAG = SalesPromotionService.class.getSimpleName();
 
-    private List<ItemsContentBean> lists;
+    private String currentModelName = "";
+
+    private List<ModelContentBean> lists;
 
     //活动大场景ID
     private int mainType = -1;
@@ -115,9 +116,6 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private List<String> picPaths = new ArrayList<>();
     private int picIndex = 0;
 
-    public SalesPromotionService() {
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
@@ -132,6 +130,13 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public int onStartCommand(Intent intent, int flags, int startId) {
         L.e(TAG, "onStartCommand");
         this.context = this;
+
+        currentModelName = intent.getStringExtra("currentModelName");
+
+        if (currentModelName == null || TextUtils.isEmpty(currentModelName)) {
+            return super.onStartCommand(intent, flags, startId);
+        }
+
         String robotName = RobotState.getInstance(this).getRobotName() == null ? "小虎" : RobotState.getInstance(this).getRobotName();
         String tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
         TtsUtils.sendTts(this, tts);
@@ -344,7 +349,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 currentIndex = 0;
             }
             L.e(TAG, "startPlay currentIndex = " + currentIndex);
-            ItemsContentBean currentBean = lists.get(currentIndex);
+            ModelContentBean currentBean = lists.get(currentIndex);
 
             if (currentBean != null) {
                 /** 跳舞时其他的执行不了 **/
@@ -513,7 +518,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private List<Integer> actionList;
     private int currentCount;
 
-    private void executeAction(ItemsContentBean currentBean) {
+    private void executeAction(ModelContentBean currentBean) {
         actionList = new ArrayList<Integer>();
         String actionStr = currentBean.getAction();
         //自带动作
@@ -850,7 +855,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         L.e(TAG, "startPlayMode : " + "type = " + type + "  mSpPlayMode  = " + mSpPlayMode + "  mPlayMode = " + mPlayMode);
         if (currentModel != type) {
             isUserBreak = true;
-            lists = DataManager.getInstance(this).queryItem(type, mainType);
+            lists = ModelContentManager.getInstance(this).queryItem(currentModelName);
             stopAllPlaying();
             startPlay(type);
         } else {

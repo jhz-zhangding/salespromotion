@@ -1,4 +1,4 @@
-package com.efrobot.salespromotion.activity.more;
+package com.efrobot.salespromotion.activity;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -25,12 +25,16 @@ import android.widget.Toast;
 import com.baidu.mobstat.StatService;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.activity.ModelNameBean;
+import com.efrobot.salespromotion.bean.ModelContentBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
+import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
+import com.efrobot.salespromotion.interfaces.ImportEvent;
 import com.efrobot.salespromotion.utils.BitmapUtils;
 import com.efrobot.salespromotion.utils.DisplayUtil;
+import com.efrobot.salespromotion.utils.ImportAndExportUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +65,11 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private LinearLayout container;
     private String picPath;
 
+    private ImportAndExportUtils mUtils;
+
+    private String currentModelName = "";
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -71,6 +80,9 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_model);
+
+        mUtils = new ImportAndExportUtils(this);
+        currentModelName = getIntent().getStringExtra("currentModelName");
 
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
         modelType = mainItemContentBean.getItemType();
@@ -83,6 +95,8 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         initData();
         registerFileManager();
 
+        findViewById(R.id.rlImport).setOnClickListener(this);
+        findViewById(R.id.rlExport).setOnClickListener(this);
     }
 
     private void initView() {
@@ -128,15 +142,17 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
             }
         }
 
-
         groupLists.add("食品");
         groupLists.add("饮料");
         groupLists.add("日化");
         groupLists.add("其他");
+
+        //分类列表
         groupAdapter = new ChooseMoreAdapter(groupLists, onChooseGoodsAdapterItemListener, mContent);
         recyclerView.setAdapter(groupAdapter);
         goodsGroupStr = mContent;
 
+        //模板列表
         modelType = getTypeByName(mContent);
         contentLists = ModelNameDataManager.getInstance(this).queryListByType(modelType);
         goodsContentStr = contentLists.get(0).getModelName();
@@ -147,6 +163,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private ChooseMoreAdapter.OnChooseDanceAdapterItemListener onChooseGoodsAdapterItemListener = new ChooseMoreAdapter.OnChooseDanceAdapterItemListener() {
         @Override
         public void onItemClick(View v, String danceName, int position) {
+            //分类选中
             goodsGroupStr = danceName;
             modelType = getTypeByName(danceName);
             contentLists = ModelNameDataManager.getInstance(MoreModelActivity.this).queryListByType(modelType);
@@ -161,6 +178,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
     private ChooseContentAdapter.OnChooseDanceAdapterItemListener onChooseContentAdapterItemListener = new ChooseContentAdapter.OnChooseDanceAdapterItemListener() {
         @Override
         public void onItemClick(View v, String danceName, int position) {
+            //
             goodsContentStr = danceName;
 
         }
@@ -215,6 +233,23 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 } else {
                     toAddMedia("image");
                 }
+                break;
+            case R.id.rlImport:
+                mUtils.importData(new ImportEvent() {
+                    @Override
+                    public void success() {
+                        //导入成功
+                    }
+
+                    @Override
+                    public void failed() {
+                        //导入失败
+                    }
+                });
+                break;
+            case R.id.rlExport:
+                List<ModelContentBean> list = ModelContentManager.getInstance(this).queryItem(currentModelName);
+                mUtils.exportData(list);
                 break;
         }
     }

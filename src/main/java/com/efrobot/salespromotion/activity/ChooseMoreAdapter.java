@@ -1,7 +1,6 @@
-package com.efrobot.salespromotion.activity.more;
+package com.efrobot.salespromotion.activity;
 
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

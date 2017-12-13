@@ -1,4 +1,4 @@
-package com.efrobot.salespromotion.activity;
+package com.efrobot.salespromotion.bean;
 
 import android.database.Cursor;
 

@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.activity.ModelNameBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
 
 import java.util.ArrayList;
 
@@ -98,6 +98,51 @@ public class ModelNameDataManager {
         db.update(CONTENT_TABLE, values, "_id=? ", new String[]{bean.getId() + ""});
     }
 
+    /**
+     * 查询模板
+     */
+    public ArrayList<ModelNameBean> queryListByName(String modelName) {
+        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
+        ArrayList<ModelNameBean> beans = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = db.query(CONTENT_TABLE, null, "modelName=? ", new String[]{modelName + ""}, null, null, null);
+            if (c != null && c.getCount() > 0) {
+                while (c.moveToNext()) {
+                    beans.add(new ModelNameBean(c));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null)
+                c.close();
+            closDb(db);
+        }
+        return beans;
+    }
+
+
+    /**
+     * 查询模板
+     */
+    public boolean queryModelNameExits(String modelName) {
+        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
+        Cursor c = null;
+        try {
+            c = db.query(CONTENT_TABLE, null, "modelName=? ", new String[]{modelName}, null, null, null);
+            if (c != null && c.getCount() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null)
+                c.close();
+            closDb(db);
+        }
+        return false;
+    }
 
     /**
      * 根据类型查询模板
@@ -123,26 +168,6 @@ public class ModelNameDataManager {
         return beans;
     }
 
-    /**
-     * 查询模板
-     */
-    public boolean queryModelNameExits(String modelName) {
-        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        Cursor c = null;
-        try {
-            c = db.query(CONTENT_TABLE, null, "modelName=? ", new String[]{modelName}, null, null, null);
-            if (c != null && c.getCount() > 0) {
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (c != null)
-                c.close();
-            closDb(db);
-        }
-        return false;
-    }
 
     /**
      * 查询模板

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.efrobot.salespromotion.bean.FaceAndActionEntity;
-import com.efrobot.salespromotion.db.DataManager;
+import com.efrobot.salespromotion.db.ModelContentManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +52,7 @@ public class DiyFaceAndActionUtils {
         if (mActionList == null || mActionList.isEmpty()) {
             mActionList = new HashMap<String, String>();
             mActionTime = new HashMap<String, String>();
-            DataManager dataManager = new DataManager();
+            ModelContentManager dataManager = new ModelContentManager();
             List<FaceAndActionEntity> list = dataManager.queryAllAction();
             if (list == null || list.isEmpty() || !PreferencesUtils.hasString(context, "action") || !"action2".equals(PreferencesUtils.getString(context, "action"))) {
                 dataManager.actionAndFace(context, "bodyaction.txt", 1);
@@ -75,7 +75,7 @@ public class DiyFaceAndActionUtils {
      */
     public HashMap<String, String> readActionTime() {
         HashMap mActionTime = new HashMap<String, String>();
-        DataManager dataManager = new DataManager();
+        ModelContentManager dataManager = new ModelContentManager();
         List<FaceAndActionEntity> list = dataManager.queryAllAction();
         if (list == null || list.isEmpty() || !PreferencesUtils.hasString(context, "action") || !"action2".equals(PreferencesUtils.getString(context, "action"))) {
             dataManager.actionAndFace(context, "bodyaction.txt", 1);

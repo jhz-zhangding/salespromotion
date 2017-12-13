@@ -37,18 +37,16 @@ import com.efrobot.library.mvp.utils.RobotToastUtil;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
-import com.efrobot.salespromotion.activity.ModelContentBean;
-import com.efrobot.salespromotion.activity.ModelNameBean;
-import com.efrobot.salespromotion.activity.more.MoreModelActivity;
+import com.efrobot.salespromotion.activity.MoreModelActivity;
 import com.efrobot.salespromotion.adapter.ChooseGoodsAdapter;
 import com.efrobot.salespromotion.adapter.MainItemAdapter;
 import com.efrobot.salespromotion.add.AddBodyShowView;
 import com.efrobot.salespromotion.base.CompressStatus;
 import com.efrobot.salespromotion.base.SalesBaseActivity;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
-import com.efrobot.salespromotion.db.DataManager;
-import com.efrobot.salespromotion.db.ModelDataManager;
+import com.efrobot.salespromotion.bean.ModelContentBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
+import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
 import com.efrobot.salespromotion.interfaces.IZipFileListener;
 import com.efrobot.salespromotion.service.SalesPromotionService;
@@ -59,7 +57,6 @@ import com.efrobot.salespromotion.utils.JsonUtil;
 import com.efrobot.salespromotion.utils.PreferencesUtils;
 import com.efrobot.salespromotion.utils.ThreadManager;
 import com.efrobot.salespromotion.utils.TimeUtil;
-import com.efrobot.salespromotion.utils.TtsUtils;
 import com.efrobot.salespromotion.utils.ZipUtil;
 import com.efrobot.salespromotion.utils.ZipUtils;
 import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
@@ -80,7 +77,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends SalesBaseActivity<MainPresenter> implements IMain, AdapterView.OnItemClickListener, View.OnClickListener {
 
-    private List<ItemsContentBean> list;
+    private List<ModelContentBean> list;
 
     public static void startSelfActivity(Context context, Bundle bundle) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -113,7 +110,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private TextView playModeHintTv;
 
-    private DataManager dataManager;
+    private ModelContentManager dataManager;
     private ModelNameDataManager modelNameDataManager;
 
     @Override
@@ -141,10 +138,14 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     @Override
     protected void onViewInit() {
         super.onViewInit();
+        currentModelName = PreferencesUtils.getString(MainActivity.this, "currentModelName", FOOD_MODEL);
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
 
-        dataManager = DataManager.getInstance(getContext());
+
+        dataManager = ModelContentManager.getInstance(getContext());
         modelNameDataManager = ModelNameDataManager.getInstance(getContext());
+
+        List<ModelContentBean> l = dataManager.queryAllContent();
 
         mainItemId = PreferencesUtils.getInt(this, SalesConstant.LAST_OPEN_ACTIVITY_ID);
 
@@ -206,6 +207,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                             @Override
                             public void run() {
                                 Intent serviceIntent = new Intent(context, SalesPromotionService.class);
+                                serviceIntent.putExtra("currentModelName", currentModelName);
                                 context.startService(serviceIntent);
                             }
                         }, 2000);
@@ -217,6 +219,10 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
             }
         }
     };
+    private String FOOD_MODEL = "食品促销模版";
+    private String DRINK_MODEL = "饮料促销模版";
+    private String DAILY_MODEL = "日化促销模版";
+    private String OTHER_MODEL = "其他促销模版";
 
     private static final int LONG_TOUCH = 100005;
     private static final int MSG_BEGIN_IMPORT = 1005;
@@ -234,6 +240,18 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                     }
                     break;
                 case CompressStatus.SUCCESS:
+                    if (mainItemContentBean.getGoodsGroup().equals("食品")) {
+                        currentModelName = FOOD_MODEL;
+                    } else if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
+                        currentModelName = DRINK_MODEL;
+                    } else if (mainItemContentBean.getGoodsGroup().equals("日化")) {
+                        currentModelName = DAILY_MODEL;
+                    } else if (mainItemContentBean.getGoodsGroup().equals("其他")) {
+                        currentModelName = OTHER_MODEL;
+                    }
+                    PreferencesUtils.putString(MainActivity.this, "currentModelName", currentModelName);
+
+
                     if (mImportDialog != null && mImportDialog.isShowing()) {
                         mImportDialog.dismiss();
                     }
@@ -340,9 +358,16 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.main_item_add_btn:
+                List<ModelNameBean> los = ModelNameDataManager.getInstance(this).queryListByName(currentModelName);
+                int modelType = -1;
+                if (los != null && los.size() > 0) {
+                    modelType = los.get(0).getModelType();
+                }
                 Intent intent = new Intent(this, AddBodyShowView.class);
                 intent.putExtra("itemNum", currentType);
                 intent.putExtra("itemType", mainItemId);
+                intent.putExtra("modelName", currentModelName);
+                intent.putExtra("modelType", modelType);
                 startActivityForResult(intent, 1);
                 break;
             case R.id.main_item_edit_btn:
@@ -399,7 +424,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 //                break;
             case R.id.rlExport:
                 //导出
-                checkList = dataManager.queryAllContent();
+                checkList = dataManager.queryItem(currentModelName);
                 if (mStorageSelecteDialog == null) {
                     mStorageSelecteDialog = new StorageSelectedDialog(this, StorageSelectedDialog.TYPE_EXPORT);
                 }
@@ -452,6 +477,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 boolean isImport = PreferencesUtils.getBoolean(this, ISIMPORT, false);
                 if (isImport) {
                     Intent intent1 = new Intent(this, MoreModelActivity.class);
+                    intent1.putExtra("currentModelName", currentModelName);
                     startActivityForResult(intent1, 1);
                 } else {
                     Toast.makeText(MainActivity.this, "请先等候数据初始化", Toast.LENGTH_SHORT).show();
@@ -557,7 +583,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 //                    ModelContentBean modelContentBean = new ModelContentBean(itemsContentBean);
 //                    modelContentBean.setModelName(modelName.getText().toString());
 //                    modelContentBean.setModelType(modeType);
-//                    ModelDataManager.getInstance(this).insertContent(modelContentBean);
+//                    ModelContentManager.getInstance(this).insertContent(modelContentBean);
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
@@ -569,7 +595,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     private StorageSelectedDialog mStorageSelecteDialog;
     private StorageSelectedDialog mImportSelecteDialog;
     public static String usbPath;
-    private List<ItemsContentBean> checkList;
+    private List<ModelContentBean> checkList;
     public final String SOURCE_JSON_PARENT_FILE = "/salespromotionzipfile";
     public final String SOURCE_JSON_FILE = "/salespromotionzipfile/salespromotionsource";
     public final String FILE_JSON_TXT = "SalesPromotionJson.txt";
@@ -651,7 +677,6 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
             ThreadManager.getInstance().createShortPool().execute(new Runnable() {
                 @Override
                 public void run() {
-                    dataManager.deleteAllContent();
                     uncompress();
                 }
             });
@@ -695,42 +720,32 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                         int result = FileUtil.copy(SalesConstant.FILE_PATH + File.separator + "salespromotionsource", Environment.getExternalStorageDirectory().toString(), true);//把数据拷贝到根目录
                         if (result == 0) {
                             //多媒体文件复制成功，开始插库
-                            List<ItemsContentBean> list = JsonUtil.getListFromJsonStr(json);
+                            List<ModelContentBean> list = JsonUtil.getListFromJsonStr(json);
                             if (list != null) {
                                 String mfilePath = mList.get(mCurrentNum);
                                 L.e(TAG, "uncompress isSuccess = " + " filePath=" + filePath);
                                 Boolean isImport = PreferencesUtils.getBoolean(MainActivity.this, ISIMPORT, false);
                                 if (!isImport) {
                                     for (int i = 0; i < list.size(); i++) {
-                                        ItemsContentBean itemsContentBean = list.get(i);
+                                        ModelContentBean modelContentBean = list.get(i);
                                         try {
-                                            ModelContentBean modelContentBean = new ModelContentBean(itemsContentBean);
                                             if (mfilePath.contains("food")) {
                                                 modelContentBean.setModelName("食品促销模版");
                                                 modelContentBean.setModelType(0);
-                                                if (mainItemContentBean.getGoodsGroup().equals("食品")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
+
                                             } else if (mfilePath.contains("drink")) {
                                                 modelContentBean.setModelName("饮料促销模版");
                                                 modelContentBean.setModelType(1);
-                                                if (mainItemContentBean.getGoodsGroup().equals("饮料")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
+
                                             } else if (mfilePath.contains("daily")) {
                                                 modelContentBean.setModelName("日化促销模版");
                                                 modelContentBean.setModelType(2);
-                                                if (mainItemContentBean.getGoodsGroup().equals("日化")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
+
                                             } else if (mfilePath.contains("other")) {
                                                 modelContentBean.setModelName("其他促销模版");
                                                 modelContentBean.setModelType(3);
-                                                if (mainItemContentBean.getGoodsGroup().equals("其他")) {
-                                                    dataManager.insertContentByResult(itemsContentBean);
-                                                }
                                             }
-                                            ModelDataManager.getInstance(MainActivity.this).insertContent(modelContentBean);
+                                            ModelContentManager.getInstance(MainActivity.this).insertContent(modelContentBean);
                                             if (!modelNameDataManager.queryModelNameExits(modelContentBean.getModelName())) {
                                                 modelNameDataManager.insertContent(new ModelNameBean(modelContentBean.getModelName(), modelContentBean.getModelType()));
                                             }
@@ -750,7 +765,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                                     uncompress();
                                 } else {
                                     for (int i = 0; i < list.size(); i++) {
-                                        ItemsContentBean itemsContentBean = list.get(i);
+                                        ModelContentBean itemsContentBean = list.get(i);
                                         boolean isSuccess = dataManager.insertContentByResult(itemsContentBean);
 //                                        if (isSuccess) {
 //
@@ -844,15 +859,17 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         }
     }
 
+    private String currentModelName = "";
+
     private void initAdapter() {
-        list = dataManager.queryItem(SalesConstant.ItemType.POWER_TYPE, mainItemId);
+        list = dataManager.queryItem(currentModelName, currentType);
         adapter = new MainItemAdapter(this, list);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(this);
     }
 
     private void updateAdapterData() {
-        list = dataManager.queryItem(currentType, mainItemId);
+        list = dataManager.queryItem(currentModelName, currentType);
         adapter.updateSourceData(list);
     }
 
@@ -933,17 +950,8 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         } else if (resultCode == 2) {
             String modelName = data.getStringExtra("modelName");
             if (modelName != null && !TextUtils.isEmpty(modelName)) {
-                dataManager.deleteAllContent();
-                List<ModelContentBean> list = ModelDataManager.getInstance(this).queryItem(modelName);
-                for (int i = 0; i < list.size(); i++) {
-                    ModelContentBean modelContentBean = list.get(i);
-                    try {
-                        ItemsContentBean itemsContentBean = new ItemsContentBean(modelContentBean);
-                        dataManager.insertContent(itemsContentBean);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                currentModelName = modelName;
+                PreferencesUtils.putString(MainActivity.this, "currentModelName", currentModelName);
             }
             updateAdapterData();
             updateTitle();

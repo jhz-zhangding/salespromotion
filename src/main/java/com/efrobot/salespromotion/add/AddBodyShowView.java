@@ -40,8 +40,8 @@ import com.efrobot.salespromotion.adapter.ChooseDanceAdapter;
 import com.efrobot.salespromotion.adapter.FaceAndActionAdapter;
 import com.efrobot.salespromotion.base.SalesBaseActivity;
 import com.efrobot.salespromotion.bean.DanceInfo;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
+import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.db.MainDataManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -258,7 +258,7 @@ public class AddBodyShowView extends SalesBaseActivity<AddBodyShowPresenter> imp
         if (intent.hasExtra("itemNum")) {
             itemNum = intent.getIntExtra("itemNum", -1);
         } else if (intent.hasExtra("content")) {
-            ItemsContentBean bean = (ItemsContentBean) intent.getSerializableExtra("content");
+            ModelContentBean bean = (ModelContentBean) intent.getSerializableExtra("content");
             if (bean != null) {
                 itemNum = bean.getItemNum();
             }

@@ -8,41 +8,42 @@ import android.text.TextUtils;
 
 import com.efrobot.salespromotion.SalesApplication;
 import com.efrobot.salespromotion.bean.FaceAndActionEntity;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
-import com.efrobot.salespromotion.provider.SalesProvider;
-import com.efrobot.salespromotion.utils.CsvWrite;
+import com.efrobot.salespromotion.bean.ModelContentBean;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Created by zd on 2017/8/18.
+ * Created by zd on 2017/11/17.
  */
-public class DataManager {
+public class ModelContentManager {
 
-    private static DataManager instance;
+    private static ModelContentManager instance;
 
     private SQLiteDatabase db = null;
+
+    public static Context mContext;
 
     /**
      * 项目中的内容
      */
-    public static String CONTENT_TABLE = SalesProvider.RobotContentColumns.TABLE_NAME;
+    public static String CONTENT_TABLE = "modelcontentbean";
 
     /**
      * 动作表
      */
-    private static String ACTION_TABLE = SalesProvider.RobotActionColumns.TABLE_NAME;
+    private static String ACTION_TABLE = "faceandactionentity";
 
-    public static Context mContext;
+    String ACRIONNUM = "actionNum";
+    String ACRIONNAME = "actionName";
+    String ACRIONTIME = "actionTime";
 
 
-    public static DataManager getInstance(Context context) {
+    public static ModelContentManager getInstance(Context context) {
         if (instance == null) {
-            instance = new DataManager();
+            instance = new ModelContentManager();
         }
         mContext = context;
         return instance;
@@ -118,10 +119,10 @@ public class DataManager {
              */
             for (int i = 0; i < len; i++) {
                 ContentValues values = new ContentValues();
-                values.put(SalesProvider.RobotActionColumns.ACRIONNUM, beans.get(i).index);
-                values.put(SalesProvider.RobotActionColumns.ACRIONNAME, beans.get(i).content);
-                values.put(SalesProvider.RobotActionColumns.ACRIONTIME, beans.get(i).time);
-                db.insert(SalesProvider.RobotActionColumns.TABLE_NAME, null, values);
+                values.put(ACRIONNUM, beans.get(i).index);
+                values.put(ACRIONNAME, beans.get(i).content);
+                values.put(ACRIONTIME, beans.get(i).time);
+                db.insert(ACTION_TABLE, null, values);
             }
 
             /**
@@ -171,15 +172,15 @@ public class DataManager {
      *
      * @return 返回动作数据集合
      */
-    public ArrayList<ItemsContentBean> queryAllContent() {
+    public ArrayList<ModelContentBean> queryAllContent() {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        ArrayList<ItemsContentBean> beans = new ArrayList<ItemsContentBean>();
+        ArrayList<ModelContentBean> beans = new ArrayList<>();
         Cursor c = null;
         try {
             c = db.query(CONTENT_TABLE, null, null, null, null, null, null);
             if (c != null && c.getCount() > 0) {
                 while (c.moveToNext()) {
-                    beans.add(new ItemsContentBean(c));
+                    beans.add(new ModelContentBean(c));
                 }
             }
         } catch (Exception e) {
@@ -192,17 +193,24 @@ public class DataManager {
         return beans;
     }
 
+    private void closDb(SQLiteDatabase db) {
+//        db.close();
+    }
+
+
     /**
      * 插入项的内容
      *
      * @param bean 内容实体类
      */
-    public void insertContent(ItemsContentBean bean) {
+    public void insertContent(ModelContentBean bean) {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
         if (bean == null)
             return;
         ContentValues values = new ContentValues();
         values.put("itemNum", bean.getItemNum());
+        values.put("modelName", bean.getModelName());
+        values.put("modelType", bean.getModelType());
         values.put("itemType", bean.getItemType());
         values.put("sport", bean.getSport());
         values.put("face", bean.getFace());
@@ -229,66 +237,58 @@ public class DataManager {
     }
 
     /**
-     * 删除保存的动作数据
-     */
-    public void deleteAllContent() {
-        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        db.delete(CONTENT_TABLE, null, null);
-        closDb(db);
-    }
-
-    /**
      * 插入项的内容
      *
      * @param bean 内容实体类
      */
-    public boolean insertContentByResult(ItemsContentBean bean) {
-        boolean isInsertSuccess = false;
+    public Boolean insertContentByResult(ModelContentBean bean) {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        if (bean == null) {
-            isInsertSuccess = false;
-        } else {
-            ContentValues values = new ContentValues();
-            values.put("itemNum", bean.getItemNum());
-            values.put("itemType", bean.getItemType());
-            values.put("sport", bean.getSport());
-            values.put("face", bean.getFace());
-            values.put("action", bean.getAction());
-            values.put("light", bean.getLight());
-            values.put("other", bean.getOther());
-            values.put("media", bean.getMedia());
-            values.put("time", bean.getTime());
-            values.put("music", bean.getMusic());
-            values.put("head", bean.getHead());
-            values.put("wheel", bean.getWheel());
-            values.put("wing", bean.getWing());
-            values.put("openLightTime", bean.getOpenLightTime());
-            values.put("flickerLightTime", bean.getFlickerLightTime());
-            values.put("faceTime", bean.getFaceTime());
-            values.put("actionSystemTime", bean.getActionSystemTime());
-            values.put("maxTime", bean.getMaxTime());
-            values.put("startAppAction", bean.getStartAppAction());
-            values.put("startAppName", bean.getStartAppName());
-            values.put("startGuestTimePart", bean.getStartGuestTimePart());
-            values.put("danceName", bean.getDanceName());
-            db.insert(CONTENT_TABLE, null, values);
-            closDb(db);
-            isInsertSuccess = true;
-        }
-        return isInsertSuccess;
+        if (bean == null)
+            return false;
+        ContentValues values = new ContentValues();
+        values.put("itemNum", bean.getItemNum());
+        values.put("modelName", bean.getModelName());
+        values.put("modelType", bean.getModelType());
+        values.put("itemType", bean.getItemType());
+        values.put("sport", bean.getSport());
+        values.put("face", bean.getFace());
+        values.put("action", bean.getAction());
+        values.put("light", bean.getLight());
+        values.put("other", bean.getOther());
+        values.put("media", bean.getMedia());
+        values.put("time", bean.getTime());
+        values.put("music", bean.getMusic());
+        values.put("head", bean.getHead());
+        values.put("wheel", bean.getWheel());
+        values.put("wing", bean.getWing());
+        values.put("openLightTime", bean.getOpenLightTime());
+        values.put("flickerLightTime", bean.getFlickerLightTime());
+        values.put("faceTime", bean.getFaceTime());
+        values.put("actionSystemTime", bean.getActionSystemTime());
+        values.put("maxTime", bean.getMaxTime());
+        values.put("startAppAction", bean.getStartAppAction());
+        values.put("startAppName", bean.getStartAppName());
+        values.put("startGuestTimePart", bean.getStartGuestTimePart());
+        values.put("danceName", bean.getDanceName());
+        db.insert(CONTENT_TABLE, null, values);
+        closDb(db);
+        return true;
     }
+
 
     /**
      * 修改某个项目的某一条内容
      *
      * @param bean
      */
-    public void upateContent(ItemsContentBean bean) {
+    public void upateContent(ModelContentBean bean) {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
         if (bean == null)
             return;
         ContentValues values = new ContentValues();
         values.put("itemNum", bean.getItemNum());
+        values.put("modelName", bean.getModelName());
+        values.put("modelType", bean.getModelType());
         values.put("itemType", bean.getItemType());
         values.put("sport", bean.getSport());
         values.put("face", bean.getFace());
@@ -313,28 +313,19 @@ public class DataManager {
         db.update(CONTENT_TABLE, values, "_id=? ", new String[]{bean.getId() + ""});
     }
 
-    public void updateItem(ItemsContentBean bean) {
-        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        if (bean == null)
-            return;
-        ContentValues values = new ContentValues();
-        values.put("maxTime", bean.getMaxTime());
-        values.put("media", bean.getMedia());
-        values.put("music", bean.getMusic());
-        db.update(CONTENT_TABLE, values, "_id=? ", new String[]{bean.getId() + ""});
-    }
 
     /**
+     * 查询模板
      */
-    public ArrayList<ItemsContentBean> queryItem(int itemNum, int mainType) {
+    public ArrayList<ModelContentBean> queryItem(String modelName, int modelType) {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        ArrayList<ItemsContentBean> beans = new ArrayList<ItemsContentBean>();
+        ArrayList<ModelContentBean> beans = new ArrayList<>();
         Cursor c = null;
         try {
-            c = db.query(CONTENT_TABLE, null, "itemNum=? and itemType=? ", new String[]{itemNum + "",mainType + ""}, null, null, null);
+            c = db.query(CONTENT_TABLE, null, "modelName=? and itemNum=? ", new String[]{modelName, modelType + ""}, null, null, null);
             if (c != null && c.getCount() > 0) {
                 while (c.moveToNext()) {
-                    beans.add(new ItemsContentBean(c));
+                    beans.add(new ModelContentBean(c));
                 }
             }
         } catch (Exception e) {
@@ -350,15 +341,15 @@ public class DataManager {
     /**
      * 查询模板
      */
-    public ArrayList<ItemsContentBean> queryItem(int contentType) {
+    public ArrayList<ModelContentBean> queryItem(String modelName) {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        ArrayList<ItemsContentBean> beans = new ArrayList<ItemsContentBean>();
+        ArrayList<ModelContentBean> beans = new ArrayList<>();
         Cursor c = null;
         try {
-            c = db.query(CONTENT_TABLE, null, "contentType=? ", new String[]{contentType + ""}, null, null, null);
+            c = db.query(CONTENT_TABLE, null, "modelName=? ", new String[]{modelName}, null, null, null);
             if (c != null && c.getCount() > 0) {
                 while (c.moveToNext()) {
-                    beans.add(new ItemsContentBean(c));
+                    beans.add(new ModelContentBean(c));
                 }
             }
         } catch (Exception e) {
@@ -372,6 +363,28 @@ public class DataManager {
     }
 
     /**
+     * 查询模板
+     */
+    public boolean queryModelNameExits(String modelName) {
+        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
+        ArrayList<ModelContentBean> beans = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = db.query(CONTENT_TABLE, null, "modelName=? ", new String[]{modelName}, null, null, null);
+            if (c != null && c.getCount() > 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c != null)
+                c.close();
+            closDb(db);
+        }
+        return false;
+    }
+
+    /**
      * 根据id删除某个项目下的某个内容
      *
      * @param id
@@ -380,26 +393,6 @@ public class DataManager {
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
         db.delete(CONTENT_TABLE, "_id = ? ", new String[]{id + ""});
         closDb(db);
-    }
-
-    private void closDb(SQLiteDatabase db) {
-//        db.close();
-    }
-
-    /**
-     * 数据库数据写成csv文件
-     *
-     * @param
-     */
-    public void writeSql(ArrayList<String> mediaPath) {
-        db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
-        Cursor cursorContent = db.query(CONTENT_TABLE, null, null, null, null, null, null);
-        CsvWrite.ExportToCSV(cursorContent, "content.csv");
-        try {
-            CsvWrite.ExportToCopyPath(mediaPath, "copypath.csv");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.efrobot.salespromotion.activity.more;
+package com.efrobot.salespromotion.activity;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -8,8 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.efrobot.salespromotion.R;
-import com.efrobot.salespromotion.activity.ModelContentBean;
-import com.efrobot.salespromotion.activity.ModelNameBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
 
 import java.util.List;
 

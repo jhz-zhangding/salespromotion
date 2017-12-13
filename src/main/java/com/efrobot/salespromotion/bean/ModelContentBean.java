@@ -1,8 +1,7 @@
-package com.efrobot.salespromotion.activity;
+package com.efrobot.salespromotion.bean;
 
 import android.database.Cursor;
 
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
@@ -129,40 +128,6 @@ public class ModelContentBean implements Serializable {
         this.startGuestTimePart = c.getString(c.getColumnIndexOrThrow("startGuestTimePart"));
         this.alternateField = c.getString(c.getColumnIndexOrThrow("alternateField"));
         this.danceName = c.getString(c.getColumnIndexOrThrow("danceName"));
-    }
-
-    public ModelContentBean(ItemsContentBean c) throws Exception {
-
-        this.id = c.getId();
-        this.itemNum = c.getItemNum();
-
-//        this.modelName = c.getModelName();
-//        this.modelType = c.getModelType();
-
-        this.itemType = c.getItemType();
-        this.sport = c.getSport();
-        this.face = c.getFace();
-        this.action = c.getAction();
-        this.light = c.getLight();
-
-        this.other = c.getOther();
-        this.media = c.getMedia();
-        this.time = c.getTime();
-        this.music = c.getMusic();
-        this.head = c.getHead();
-        this.wheel = c.getWheel();
-        this.wing = c.getWing();
-        this.openLightTime = c.getOpenLightTime();
-        this.flickerLightTime = c.getFlickerLightTime();
-        this.faceTime = c.getFaceTime();
-        this.actionTime = c.getActionTime();
-        this.actionSystemTime = c.getActionSystemTime();
-        this.maxTime = c.getMaxTime();
-        this.startAppAction = c.getStartAppAction();
-        this.startAppName = c.getStartAppName();
-        this.startGuestTimePart = c.getStartGuestTimePart();
-        this.alternateField = c.getAlternateField();
-        this.danceName = c.getDanceName();
     }
 
     public int getId() {

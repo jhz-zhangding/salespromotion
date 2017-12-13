@@ -17,10 +17,11 @@ import com.efrobot.salespromotion.adapter.AddFaceAndActionAdapter;
 import com.efrobot.salespromotion.adapter.FaceAndActionAdapter;
 import com.efrobot.salespromotion.base.SalesBasePresenter;
 import com.efrobot.salespromotion.bean.FaceAndActionEntity;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
-import com.efrobot.salespromotion.db.DataManager;
+import com.efrobot.salespromotion.bean.ModelContentBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
 import com.efrobot.salespromotion.db.MainDataManager;
+import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.utils.DiyFaceAndActionUtils;
 import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
 
@@ -48,13 +49,17 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
     /**
      * 本地数据库管理
      */
-    DataManager localDB;
+    ModelContentManager localDB;
     /**
      * 标记表情和动作
      * 1表情 2动作
      */
     private int type = 0;
     private int itemNum = -1;
+
+    private String modelName = "";
+    private int modelType = -1;
+
     private int itemType = -1;
     private String danceName = "";
     //0系统动作，1自定义
@@ -86,7 +91,7 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
     /**
      * 编辑后的内容
      */
-    private ItemsContentBean bean;
+    private ModelContentBean bean;
 
     /**
      * 表情、动作帮助类
@@ -160,7 +165,7 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
         }
 
 //        dataBaseManager = new DataBaseManager(getContext());
-        localDB = DataManager.getInstance(getContext());
+        localDB = ModelContentManager.getInstance(getContext());
         util = DiyFaceAndActionUtils.getInstance(getContext());
         mActionList = new HashMap<String, String>();
 //        mActionList = FaceAndActionUtils.getInstance(getContext()).readActionData();
@@ -206,16 +211,25 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
             itemType = intent.getIntExtra("itemType", -1);
         }
 
-        bean = new ItemsContentBean();
+        if (intent.hasExtra("modelName")) {
+            modelName = intent.getStringExtra("modelName");
+        }
+        if (intent.hasExtra("modelType")) {
+            modelType = intent.getIntExtra("modelType", -1);
+        }
+
+        bean = new ModelContentBean();
 
         initValue();
         if (intent.hasExtra("content")) {
 
             dbType = 2;
-            bean = (ItemsContentBean) intent.getSerializableExtra("content");
+            bean = (ModelContentBean) intent.getSerializableExtra("content");
 
             if (bean != null) {
                 itemNum = bean.getItemNum();
+                modelName = bean.getModelName();
+                modelType = bean.getModelType();
                 itemType = bean.getItemType();
                 finishFace = bean.getFace();
                 finishAction = bean.getAction();
@@ -409,7 +423,7 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
             showToast("请注意！自定义上传文件已丢失");
         }
         if (isUpdateTime || isToast) {
-            localDB.updateItem(bean);
+            localDB.upateContent(bean);
         }
 
         initValue();
@@ -669,6 +683,8 @@ public class AddBodyShowPresenter extends SalesBasePresenter<IAddBodyShowView> {
         }
 
         bean.setItemType(itemType);
+        bean.setModelName(modelName);
+        bean.setModelType(modelType);
         bean.setItemNum(itemNum);
         if (!titleFace.isEmpty()) {
             bean.setFace(getAllFace(true));

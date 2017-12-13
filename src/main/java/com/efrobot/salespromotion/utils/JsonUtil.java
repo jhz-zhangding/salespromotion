@@ -1,8 +1,6 @@
 package com.efrobot.salespromotion.utils;
 
-import android.text.TextUtils;
-
-import com.efrobot.salespromotion.bean.ItemsContentBean;
+import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -17,7 +15,7 @@ public class JsonUtil {
     /**
      * list集合转为Json字符串
      */
-    public static String getJsonStrFromList(List<ItemsContentBean> objects) {
+    public static String getJsonStrFromList(List<ModelContentBean> objects) {
         if (objects != null) {
             if (objects != null && objects.size() > 0) {
                 String json = new Gson().toJson(objects);
@@ -27,9 +25,9 @@ public class JsonUtil {
         return "";
     }
 
-    public static List<ItemsContentBean> getListFromJsonStr(String content) {
+    public static List<ModelContentBean> getListFromJsonStr(String content) {
         Gson gson = new Gson();
-        List<ItemsContentBean> list = gson.fromJson(content, new TypeToken<List<ItemsContentBean>>() {
+        List<ModelContentBean> list = gson.fromJson(content, new TypeToken<List<ModelContentBean>>() {
         }.getType());
         return list;
     }

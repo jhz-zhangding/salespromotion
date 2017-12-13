@@ -4,10 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.efrobot.library.mvp.utils.L;
-import com.efrobot.salespromotion.activity.ModelContentBean;
-import com.efrobot.salespromotion.activity.ModelNameBean;
+import com.efrobot.salespromotion.bean.ModelContentBean;
+import com.efrobot.salespromotion.bean.ModelNameBean;
 import com.efrobot.salespromotion.bean.FaceAndActionEntity;
-import com.efrobot.salespromotion.bean.ItemsContentBean;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
@@ -45,7 +44,6 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.createTable(connectionSource, FaceAndActionEntity.class);
             TableUtils.createTable(connectionSource, MainItemContentBean.class);
-            TableUtils.createTable(connectionSource, ItemsContentBean.class);
 
             TableUtils.createTable(connectionSource, ModelNameBean.class);
             TableUtils.createTable(connectionSource, ModelContentBean.class);
