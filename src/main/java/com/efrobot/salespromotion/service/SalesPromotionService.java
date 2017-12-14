@@ -115,6 +115,8 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
     private List<String> picPaths = new ArrayList<>();
     private int picIndex = 0;
+    private int currentType;
+    private String tts;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -132,21 +134,24 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         this.context = this;
 
         currentModelName = intent.getStringExtra("currentModelName");
+        currentType = intent.getIntExtra("currentType", 1);
+
 
         if (currentModelName == null || TextUtils.isEmpty(currentModelName)) {
             return super.onStartCommand(intent, flags, startId);
         }
 
-        String robotName = RobotState.getInstance(this).getRobotName() == null ? "小虎" : RobotState.getInstance(this).getRobotName();
-        String tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
-        TtsUtils.sendTts(this, tts);
-
-
         initEvent();
         initData();
 
+
+        String robotName = RobotState.getInstance(this).getRobotName() == null ? "小虎" : RobotState.getInstance(this).getRobotName();
+        tts = "进入工作状态，您可以用倥鼠控制" + robotName + "啦";
+        mHandle.sendEmptyMessageDelayed(SAY_START_WORDS, 3000);
+
+
         mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
-        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 6000);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 8000);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -198,6 +203,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public final int SHOW_GOODS_PIC = 7;
     public final int START_AUTO_PLAY = 8;
     public final int PICTURE_FINISH = 9;
+    public final int SAY_START_WORDS = 10;
     private int clearPicTime = 3000;
     public Handler mHandle = new Handler() {
         @Override
@@ -265,7 +271,10 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     }
                     break;
                 case START_AUTO_PLAY:
-                    startPlayMode(SalesConstant.ItemType.POWER_TYPE);
+                    startPlayMode(currentType);
+                    break;
+                case SAY_START_WORDS:
+                    TtsUtils.sendTts(context, tts);
                     break;
             }
         }
@@ -770,6 +779,8 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 boolean isOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
                 boolean isOpening = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
                 if (isOpen || isOpening) {
+                    L.e(TAG, "监听盖子状态:" + "isOpen = " + isOpen + " isOpening" + isOpening);
+                    stopAllPlaying();
                     stopSelf();
                     unregisterReceiver(lidBoardReceive);
                 }
@@ -855,7 +866,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         L.e(TAG, "startPlayMode : " + "type = " + type + "  mSpPlayMode  = " + mSpPlayMode + "  mPlayMode = " + mPlayMode);
         if (currentModel != type) {
             isUserBreak = true;
-            lists = ModelContentManager.getInstance(this).queryItem(currentModelName);
+            lists = ModelContentManager.getInstance(this).queryItem(currentModelName, type);
             stopAllPlaying();
             startPlay(type);
         } else {
@@ -930,10 +941,12 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     };
 
     private void clearAllMessage() {
-        mHandle.removeMessages(TTS_FINISH);
-        mHandle.removeMessages(PLAY_MORE_ACTION);
-        mHandle.removeMessages(VIDEO_FINISH);
-        mHandle.removeMessages(MUSIC_NEED_SAY);
+        if (mHandle != null) {
+            mHandle.removeMessages(TTS_FINISH);
+            mHandle.removeMessages(PLAY_MORE_ACTION);
+            mHandle.removeMessages(VIDEO_FINISH);
+            mHandle.removeMessages(MUSIC_NEED_SAY);
+        }
     }
 
     @Override
@@ -957,6 +970,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         if (mHandle != null) {
             mHandle.removeCallbacksAndMessages(null);
             mHandle.removeMessages(CLEAR_SPEECH_SLEEP);
+            mHandle.removeMessages(SAY_START_WORDS);
             mHandle = null;
         }
 

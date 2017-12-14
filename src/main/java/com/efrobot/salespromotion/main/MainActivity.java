@@ -1,10 +1,8 @@
 package com.efrobot.salespromotion.main;
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,6 +32,7 @@ import com.baidu.mobstat.StatService;
 import com.base.utils.L;
 import com.efrobot.library.mvp.presenter.BasePresenter;
 import com.efrobot.library.mvp.utils.RobotToastUtil;
+import com.efrobot.library.net.TextMessage;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
@@ -49,7 +48,6 @@ import com.efrobot.salespromotion.bean.ModelNameBean;
 import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
 import com.efrobot.salespromotion.interfaces.IZipFileListener;
-import com.efrobot.salespromotion.service.SalesPromotionService;
 import com.efrobot.salespromotion.utils.DataFileUtils;
 import com.efrobot.salespromotion.utils.DisplayUtil;
 import com.efrobot.salespromotion.utils.FileUtil;
@@ -57,12 +55,16 @@ import com.efrobot.salespromotion.utils.JsonUtil;
 import com.efrobot.salespromotion.utils.PreferencesUtils;
 import com.efrobot.salespromotion.utils.ThreadManager;
 import com.efrobot.salespromotion.utils.TimeUtil;
+import com.efrobot.salespromotion.utils.UpdateUtils;
 import com.efrobot.salespromotion.utils.ZipUtil;
 import com.efrobot.salespromotion.utils.ZipUtils;
 import com.efrobot.salespromotion.utils.ui.CustomHintDialog;
 import com.efrobot.salespromotion.utils.ui.ImportDialog;
 import com.efrobot.salespromotion.utils.ui.LoadingDialog;
 import com.efrobot.salespromotion.utils.ui.StorageSelectedDialog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -72,12 +74,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends SalesBaseActivity<MainPresenter> implements IMain, AdapterView.OnItemClickListener, View.OnClickListener {
 
     private List<ModelContentBean> list;
+    private Intent serviceIntent;
 
     public static void startSelfActivity(Context context, Bundle bundle) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -96,8 +97,6 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private TextView addBtn, editBtn;
 
-    private int currentType = 1;
-
     private boolean mCurrentShowDel = false;
 
     private MainItemContentBean mainItemContentBean;
@@ -112,6 +111,16 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private ModelContentManager dataManager;
     private ModelNameDataManager modelNameDataManager;
+
+    /**
+     * 当前选中模板
+     */
+    public static String currentModelName = "";
+
+    /**
+     * 当前选中类型
+     */
+    public static int currentType = 1;
 
     @Override
     protected int getContentViewResource() {
@@ -129,16 +138,14 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         SalesApplication.isNeedStartService = true;
         L.e(TAG, "onResume isNeedStartService = " + SalesApplication.isNeedStartService);
         StatService.onResume(this);
-
-        IntentFilter dynamic_filter = new IntentFilter();
-        dynamic_filter.addAction(ROBOT_MASK_CHANGE);
-        registerReceiver(lidBoardReceive, dynamic_filter);
     }
 
     @Override
     protected void onViewInit() {
         super.onViewInit();
+        checkUpdateInfo();
         currentModelName = PreferencesUtils.getString(MainActivity.this, "currentModelName", FOOD_MODEL);
+
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
 
 
@@ -189,36 +196,6 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         mHandle.sendEmptyMessage(MSG_UNCOMPRESS_DEFAULT);
     }
 
-    public final static String ROBOT_MASK_CHANGE = "android.intent.action.MASK_CHANGED";
-    public final static String KEYCODE_MASK_ONPROGRESS = "KEYCODE_MASK_ONPROGRESS"; //开闭状态
-    public final static String KEYCODE_MASK_CLOSE = "KEYCODE_MASK_CLOSE"; //关闭面罩
-    public final static String KEYCODE_MASK_OPEN = "KEYCODE_MASK_OPEN";  //打开面罩
-    private BroadcastReceiver lidBoardReceive = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            if (ROBOT_MASK_CHANGE.equals(intent.getAction())) {
-                boolean close = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
-                boolean maskOnProgress = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
-                boolean maskOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
-                Log.i(TAG, "lidBoardReceive get data----" + "close----" + close + "  maskOnProgress----" + maskOnProgress + "  maskOpen----" + maskOpen);
-                if (close) {
-                    try {
-                        new Timer().schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                Intent serviceIntent = new Intent(context, SalesPromotionService.class);
-                                serviceIntent.putExtra("currentModelName", currentModelName);
-                                context.startService(serviceIntent);
-                            }
-                        }, 2000);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    };
     private String FOOD_MODEL = "食品促销模版";
     private String DRINK_MODEL = "饮料促销模版";
     private String DAILY_MODEL = "日化促销模版";
@@ -324,7 +301,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private void updateTitle() {
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
-        title.setText(mainItemContentBean.getGoodsName() + "促销");
+        title.setText(currentModelName);
     }
 
     private final String ISIMPORT = "isImport";
@@ -391,24 +368,28 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 mainPlayKeyImg.setBackgroundResource(R.mipmap.mouse_key_power);
                 updateView(v);
                 updateAdapterData();
+                RobotToastUtil.getInstance(this).showToast("关闭面罩后，自动播放按键1的内容", Toast.LENGTH_LONG);
                 break;
             case R.id.main_key_game:
                 currentType = SalesConstant.ItemType.GAME_TYPE;
                 mainPlayKeyImg.setBackgroundResource(R.mipmap.mouse_key_game);
                 updateView(v);
                 updateAdapterData();
+                RobotToastUtil.getInstance(this).showToast("关闭面罩后，自动播放按键2的内容", Toast.LENGTH_LONG);
                 break;
             case R.id.main_key_home:
                 currentType = SalesConstant.ItemType.HOME_TYPE;
                 mainPlayKeyImg.setBackgroundResource(R.mipmap.mouse_key_home);
                 updateView(v);
                 updateAdapterData();
+                RobotToastUtil.getInstance(this).showToast("关闭面罩后，自动播放按键3的内容", Toast.LENGTH_LONG);
                 break;
             case R.id.main_key_back:
                 currentType = SalesConstant.ItemType.BACK_TYPE;
                 mainPlayKeyImg.setBackgroundResource(R.mipmap.mouse_key_back);
                 updateView(v);
                 updateAdapterData();
+                RobotToastUtil.getInstance(this).showToast("关闭面罩后，自动播放按键4的内容", Toast.LENGTH_LONG);
                 break;
             case R.id.main_play_mode_img:
                 String mSpPlayMode = getSpByType(currentType);
@@ -872,7 +853,6 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         }
     }
 
-    private String currentModelName = "";
 
     private void initAdapter() {
         list = dataManager.queryItem(currentModelName, currentType);
@@ -940,6 +920,59 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
     }
 
+    CustomHintDialog mUpdateDialog;
+    private void checkUpdateInfo() {
+        final String versionName = new UpdateUtils().getVersion(getContext(), getContext().getPackageName());
+        new UpdateUtils().getInstance().getAppDetail(getContext(), getContext().getPackageName(), new UpdateUtils.onAppCallBack() {
+            @Override
+            public void onSuccess(TextMessage message, String result) {
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.has("appVersion")) {
+                        String newVersion = jsonObject.optString("appVersion");
+                        if (!TextUtils.isEmpty(versionName) && !TextUtils.isEmpty(newVersion)) {
+                            float mVersionName = Float.parseFloat(versionName);
+                            float mNewVersionName = Float.parseFloat(newVersion);
+                            if (mNewVersionName > mVersionName) {
+                                /** 检测商城有新的版本号 需要提示更新 */
+                                mUpdateDialog = new CustomHintDialog(getContext(), -1);
+                                mUpdateDialog.setTitle("提示");
+                                mUpdateDialog.setMessage("检测到促销助手有新版本，请前往商城管理页面打开已购项目进行更新");
+//                                mUpdateDialog.setSubmitButton("前往", new CustomHintDialog.IButtonOnClickLister() {
+//                                    @Override
+//                                    public void onClickLister() {
+//                                        Intent intent = new Intent();
+//                                        ComponentName componentName = new ComponentName("com.efrobot.appstore", "com.efrobot.appstore.activity.SplashView");
+//                                        intent.setComponent(componentName);
+//                                        intent.putExtra("msg", 5);
+//                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                        getContext().startActivity(intent);
+//                                    }
+//                                });
+                                mUpdateDialog.setCancleButton("确 定", new CustomHintDialog.IButtonOnClickLister() {
+                                    @Override
+                                    public void onClickLister() {
+                                        if (mUpdateDialog != null) {
+                                            mUpdateDialog.dismiss();
+                                        }
+                                    }
+                                });
+                                mUpdateDialog.show();
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFail(TextMessage message, int errorCode, String errorMessage) {
+
+            }
+        });
+    }
+
     @Override
     public Context getContext() {
         return this;
@@ -977,9 +1010,6 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         SalesApplication.isNeedStartService = false;
         L.e(TAG, "onPause isNeedStartService = " + SalesApplication.isNeedStartService);
         StatService.onPause(this);
-        if (lidBoardReceive != null) {
-            unregisterReceiver(lidBoardReceive);
-        }
     }
 
     @Override

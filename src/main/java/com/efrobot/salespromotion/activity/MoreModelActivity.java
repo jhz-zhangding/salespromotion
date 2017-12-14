@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
+import com.efrobot.library.mvp.utils.RobotToastUtil;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.SalesApplication;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
@@ -86,7 +87,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
         setContentView(R.layout.activity_more_model);
 
         mUtils = new ImportAndExportUtils(this);
-        currentModelName = getIntent().getStringExtra("currentModelName");
+        currentModelName = getIntent().getStringExtra("currentModelName") == null ? "" : getIntent().getStringExtra("currentModelName");
 
         mainItemContentBean = SalesApplication.getAppContext().getMainItemContentBean();
         modelType = mainItemContentBean.getItemType();
@@ -242,6 +243,10 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                     @Override
                     public void success() {
                         //导入成功
+                        contentLists = ModelNameDataManager.getInstance(MoreModelActivity.this).queryListByType(modelType);
+                        if (contentAdapter != null) {
+                            contentAdapter.updateContent(contentLists, goodsContentStr);
+                        }
                     }
 
                     @Override
@@ -255,7 +260,7 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 mUtils.exportData(list);
                 break;
             case R.id.rlDelete:
-                showDeleteDialog("是否删除此模板", currentModelName);
+                showDeleteDialog("是否删除此模板", goodsContentStr);
                 break;
             case R.id.rlCreate:
                 showCreateDialog("");
@@ -343,6 +348,11 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
      * 删除模板提示框
      */
     private void showDeleteDialog(String content, final String mModelName) {
+        if (mModelName == null || mModelName.isEmpty()) {
+            RobotToastUtil.getInstance(this).showToast("无选中模版");
+            return;
+        }
+
         final CustomHintDialog dialog = new CustomHintDialog(this, -1);
         dialog.setMessage(content);
         dialog.setCancleButton(this.getString(R.string.cancel), new CustomHintDialog.IButtonOnClickLister() {

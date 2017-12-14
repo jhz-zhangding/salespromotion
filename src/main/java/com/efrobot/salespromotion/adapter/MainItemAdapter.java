@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.efrobot.salespromotion.Env.SalesConstant;
@@ -87,7 +88,7 @@ public class MainItemAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.number = (TextView) convertView.findViewById(R.id.main_item_number);
             viewHolder.content = (TextView) convertView.findViewById(R.id.main_item_content);
-            viewHolder.delete = (ImageView) convertView.findViewById(R.id.main_item_delete);
+            viewHolder.delete = (LinearLayout) convertView.findViewById(R.id.main_item_delete);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -148,7 +149,7 @@ public class MainItemAdapter extends BaseAdapter {
     class ViewHolder {
         TextView number;
         TextView content;
-        ImageView delete;
+        LinearLayout delete;
     }
 
 }

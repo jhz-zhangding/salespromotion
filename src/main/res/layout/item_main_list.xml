@@ -14,8 +14,7 @@
         android:minHeight="60dp"
         android:minWidth="950dp"
         android:orientation="horizontal"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+
         >
 
         <TextView
@@ -38,19 +37,29 @@
             android:textSize="20sp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
             android:text=""
             />
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/main_item_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@mipmap/del"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="15dp"
+            android:padding="15dp"
             android:visibility="gone"
+            android:minHeight="60dp"
+            >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/del"
+            android:layout_marginRight="15dp"
+
             />
+        </LinearLayout>
 
     </LinearLayout>
 

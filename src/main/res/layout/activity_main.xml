@@ -36,7 +36,9 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/rlImport"
             android:padding="@dimen/padding_20"
-            android:src="@mipmap/export" />
+            android:src="@mipmap/export"
+            android:visibility="gone"
+            />
 
         <ImageView
             android:id="@+id/rlImport"
@@ -46,7 +48,9 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="30dp"
             android:padding="@dimen/padding_20"
-            android:src="@mipmap/import_img" />
+            android:src="@mipmap/import_img"
+            android:visibility="gone"
+            />
 
     </RelativeLayout>
 

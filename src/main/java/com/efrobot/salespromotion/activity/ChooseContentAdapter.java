@@ -39,7 +39,6 @@ public class ChooseContentAdapter extends RecyclerView.Adapter<ChooseContentAdap
     }
 
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.setting_item_goods_group_list, null);
@@ -49,11 +48,13 @@ public class ChooseContentAdapter extends RecyclerView.Adapter<ChooseContentAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (list.get(position).getModelName().equals(checkContent)) {
+        if (list.get(position).getModelName() != null) {
+            if (list.get(position).getModelName().equals(checkContent)) {
 //            holder.textView.setBackgroundResource(R.drawable.diy_default_setting_btn_bg);
-            holder.textView.setSelected(true);
-        } else {
+                holder.textView.setSelected(true);
+            } else {
                 holder.textView.setSelected(false);
+            }
         }
         holder.textView.setText(list.get(position).getModelName());
 

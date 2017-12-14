@@ -127,6 +127,9 @@ public class ModelNameDataManager {
      * 查询模板
      */
     public boolean queryModelNameExits(String modelName) {
+        if(modelName == null || modelName.isEmpty()) {
+            return false;
+        }
         db = SalesApplication.from(mContext).getDataBase().getWritableDatabase();
         Cursor c = null;
         try {

@@ -1,7 +1,10 @@
 package com.efrobot.salespromotion;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.text.TextUtils;
 
 import com.baidu.mobstat.StatService;
@@ -9,6 +12,7 @@ import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.db.DbHelper;
 import com.efrobot.salespromotion.db.MainDataManager;
+import com.efrobot.salespromotion.main.MainActivity;
 import com.efrobot.salespromotion.player.MediaPlayDialog;
 import com.efrobot.salespromotion.service.SalesPromotionService;
 import com.efrobot.salespromotion.utils.PreferencesUtils;
@@ -19,6 +23,11 @@ import java.util.List;
  * Created by zd on 2017/11/10.
  */
 public class SalesApplication extends Application {
+
+    String ROBOT_MASK_CHANGE = "android.intent.action.MASK_CHANGED";
+    public final static String KEYCODE_MASK_ONPROGRESS = "KEYCODE_MASK_ONPROGRESS";
+    public final static String KEYCODE_MASK_CLOSE = "KEYCODE_MASK_CLOSE";
+    public final static String KEYCODE_MASK_OPEN = "KEYCODE_MASK_OPEN";
 
     private static SalesApplication instance;
 
@@ -38,10 +47,48 @@ public class SalesApplication extends Application {
 
         StatService.setDebugOn(true);
 
+        registerDynamicStateReceiver();
+
         instance = this;
         PreferencesUtils.putInt(this, SalesConstant.GAME_PLAY_MODE, SalesConstant.ORDER_MODE);
         PreferencesUtils.putInt(this, SalesConstant.HOME_PLAY_MODE, SalesConstant.ORDER_MODE);
     }
+
+    private void registerDynamicStateReceiver() {
+        MaskBroadCast maskBroadCast = new MaskBroadCast();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ROBOT_MASK_CHANGE);
+        registerReceiver(maskBroadCast, filter);
+    }
+
+    private class MaskBroadCast extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals(ROBOT_MASK_CHANGE)) {
+                boolean maskOnProgress = intent.getBooleanExtra(KEYCODE_MASK_ONPROGRESS, false);
+                boolean maskClose = intent.getBooleanExtra(KEYCODE_MASK_CLOSE, false);
+                boolean maskOpen = intent.getBooleanExtra(KEYCODE_MASK_OPEN, false);
+
+                if (maskClose) {
+                    if (isNeedStartService) {
+                        Intent intentService = new Intent(context, SalesPromotionService.class);
+                        intentService.putExtra("currentModelName", MainActivity.currentModelName);
+                        intentService.putExtra("currentType", MainActivity.currentType);
+                        context.startService(intentService);
+                    }
+                } else if (maskOpen) {
+                    if (salesPromotionService != null) {
+                        salesPromotionService.stopSelf();
+                    }
+                }
+
+            }
+        }
+    }
+
 
     public static SalesApplication getAppContext() {
         return instance;
