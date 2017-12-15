@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -590,7 +591,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         public void run() {
             String copyPath = usbPath + SOURCE_JSON_FILE;
             boolean bool = DataFileUtils.createFile(copyPath);
-            Log.e(TAG, "create file ...bool=" + bool);
+            Log.e(TAG, "create_1 file ...bool=" + bool);
             if (bool) {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
                 String json = JsonUtil.getJsonStrFromList(checkList);
@@ -1021,4 +1022,28 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        L.e(TAG, "keyCode = " + keyCode);
+        return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        event.isTracking();
+        return true;
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        return true;
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        return false;
+    }
+
+
 }

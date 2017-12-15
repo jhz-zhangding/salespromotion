@@ -1,10 +1,14 @@
 package com.efrobot.salespromotion.activity;
 
+import android.graphics.Color;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.efrobot.salespromotion.R;
@@ -41,7 +45,7 @@ public class ChooseContentAdapter extends RecyclerView.Adapter<ChooseContentAdap
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.setting_item_goods_group_list, null);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.setting_item_goods_content_list, null);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -51,9 +55,11 @@ public class ChooseContentAdapter extends RecyclerView.Adapter<ChooseContentAdap
         if (list.get(position).getModelName() != null) {
             if (list.get(position).getModelName().equals(checkContent)) {
 //            holder.textView.setBackgroundResource(R.drawable.diy_default_setting_btn_bg);
-                holder.textView.setSelected(true);
+                holder.imageView.setBackgroundResource(R.mipmap.model_img_select);
+                holder.textView.setTextColor(Color.rgb(0xff, 0x8f, 0x00));
             } else {
-                holder.textView.setSelected(false);
+                holder.imageView.setBackgroundResource(R.mipmap.model_img_unselect);
+                holder.textView.setTextColor(Color.WHITE);
             }
         }
         holder.textView.setText(list.get(position).getModelName());
@@ -67,12 +73,16 @@ public class ChooseContentAdapter extends RecyclerView.Adapter<ChooseContentAdap
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        LinearLayout linearLayout;
+        ImageView imageView;
         TextView textView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.face_action_item_text);
-            textView.setOnClickListener(this);
+            linearLayout = (LinearLayout) itemView.findViewById(R.id.content_ll);
+            imageView = (ImageView) itemView.findViewById(R.id.content_image);
+            textView = (TextView) itemView.findViewById(R.id.content_text);
+            linearLayout.setOnClickListener(this);
         }
 
         @Override

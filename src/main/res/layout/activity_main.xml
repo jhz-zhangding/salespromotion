@@ -221,7 +221,7 @@
                     android:layout_marginLeft="15dp"
                     android:text="播放方式：点按空鼠"
                     android:textColor="@color/white"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
 
                 <ImageView
                     android:id="@+id/main_play_key_img"
@@ -241,7 +241,7 @@
                     android:layout_toRightOf="@+id/main_play_key_img"
                     android:text="键"
                     android:textColor="@color/white"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/main_play_mode_text"
@@ -252,7 +252,7 @@
                     android:layout_toRightOf="@+id/main_key_text"
                     android:text="顺序循环播放"
                     android:textColor="@color/white"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
 
                 <RelativeLayout
                     android:layout_width="60dp"
@@ -281,7 +281,7 @@
                     android:background="@drawable/button_bg"
                     android:text="编辑"
                     android:textColor="@color/white"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/main_item_add_btn"
@@ -293,7 +293,7 @@
                     android:background="@drawable/button_bg"
                     android:text="新增"
                     android:textColor="@color/white"
-                    android:textSize="26sp" />
+                    android:textSize="24sp" />
             </RelativeLayout>
 
             <ListView
@@ -331,9 +331,13 @@
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="30dp"
                     android:background="@drawable/button_bg"
+                    android:drawableRight="@mipmap/setting_img"
+                    android:drawablePadding="5dp"
                     android:text="@string/more_sales_model"
                     android:textColor="@color/white"
-                    android:textSize="28sp" />
+                    android:textSize="24sp"
+                    android:gravity="center"
+                    />
 
             </RelativeLayout>
 

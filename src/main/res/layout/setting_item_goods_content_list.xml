@@ -9,33 +9,32 @@
     android:paddingTop="9dp">
 
     <LinearLayout
-        android:id="@+id/group_ll"
+        android:id="@+id/content_ll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="180dp"
-        android:background="@drawable/setting_button_bg"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
         >
 
+        <ImageView
+            android:id="@+id/content_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_model_bg"
+            />
+
         <TextView
-            android:id="@+id/face_action_item_text"
+            android:id="@+id/content_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:padding="2dp"
+            android:padding="8dp"
             android:singleLine="true"
-            android:text=""
-            android:textColor="@color/white"
+            android:text="huodongfhsudkfhssf"
+            android:textColor="@drawable/button_text_bg"
             android:textSize="22sp" />
 
-        <ImageView
-            android:id="@+id/group_goods_img"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="5dp"
-            />
-
     </LinearLayout>
+
 </LinearLayout>

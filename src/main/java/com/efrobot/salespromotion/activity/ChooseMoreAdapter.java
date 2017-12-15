@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.efrobot.salespromotion.R;
@@ -41,15 +43,24 @@ public class ChooseMoreAdapter extends RecyclerView.Adapter<ChooseMoreAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (list.get(position).equals(checkContent)) {
 //            holder.textView.setBackgroundResource(R.drawable.diy_default_setting_btn_bg);
-            holder.textView.setSelected(true);
+            holder.linearLayout.setSelected(true);
         } else {
             if (position == mSelectPosition) {
-                holder.textView.setSelected(true);
+                holder.linearLayout.setSelected(true);
             } else {
-                holder.textView.setSelected(false);
+                holder.linearLayout.setSelected(false);
             }
         }
         holder.textView.setText(list.get(position));
+        if(position == 0) {
+            holder.imageView.setImageResource(R.mipmap.food_img);
+        } else if(position == 1) {
+            holder.imageView.setImageResource(R.mipmap.drink_img);
+        } else if(position == 2) {
+            holder.imageView.setImageResource(R.mipmap.daily_img);
+        } else if(position == 3) {
+            holder.imageView.setImageResource(R.mipmap.other_img);
+        }
 
     }
 
@@ -61,11 +72,16 @@ public class ChooseMoreAdapter extends RecyclerView.Adapter<ChooseMoreAdapter.Vi
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
+        ImageView imageView;
+        LinearLayout linearLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
             textView = (TextView) itemView.findViewById(R.id.face_action_item_text);
-            textView.setOnClickListener(this);
+            linearLayout = (LinearLayout) itemView.findViewById(R.id.group_ll);
+            linearLayout.setOnClickListener(this);
+
+            imageView = (ImageView) itemView.findViewById(R.id.group_goods_img);
         }
 
         @Override
