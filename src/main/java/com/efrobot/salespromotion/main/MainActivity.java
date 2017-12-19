@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -46,6 +45,8 @@ import com.efrobot.salespromotion.base.SalesBaseActivity;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
 import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.bean.ModelNameBean;
+import com.efrobot.salespromotion.bean.PlayModeBean;
+import com.efrobot.salespromotion.db.ModeManager;
 import com.efrobot.salespromotion.db.ModelContentManager;
 import com.efrobot.salespromotion.db.ModelNameDataManager;
 import com.efrobot.salespromotion.interfaces.IZipFileListener;
@@ -74,12 +75,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends SalesBaseActivity<MainPresenter> implements IMain, AdapterView.OnItemClickListener, View.OnClickListener {
 
     private List<ModelContentBean> list;
     private Intent serviceIntent;
+    private TextView versionName;
 
     public static void startSelfActivity(Context context, Bundle bundle) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -123,6 +127,11 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
      */
     public static int currentType = 1;
 
+    /**
+     * 设置播放模式
+     */
+    private Map<Integer, Integer> map = new HashMap<>();
+
     @Override
     protected int getContentViewResource() {
         return R.layout.activity_main;
@@ -144,6 +153,13 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     @Override
     protected void onViewInit() {
         super.onViewInit();
+
+        versionName = (TextView) findViewById(R.id.advanced_setting_version_name);
+        String versionInfo = new UpdateUtils().getVersion(this, this.getPackageName());
+        if (!TextUtils.isEmpty(versionInfo)) {
+            versionName.setText("版本:" + versionInfo);
+        }
+
         checkUpdateInfo();
         currentModelName = PreferencesUtils.getString(MainActivity.this, "currentModelName", FOOD_MODEL);
 
@@ -195,6 +211,70 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         findViewById(R.id.main_more_model).setOnClickListener(this);
 
         mHandle.sendEmptyMessage(MSG_UNCOMPRESS_DEFAULT);
+        setMap();
+    }
+
+    private void setMap() {
+        map.put(SalesConstant.ItemType.POWER_TYPE, PreferencesUtils.getInt(this, SalesConstant.POWER_PLAY_MODE, SalesConstant.CIRCLE_MODE));
+        map.put(SalesConstant.ItemType.GAME_TYPE, PreferencesUtils.getInt(this, SalesConstant.GAME_PLAY_MODE, SalesConstant.ORDER_MODE));
+        map.put(SalesConstant.ItemType.HOME_TYPE, PreferencesUtils.getInt(this, SalesConstant.HOME_PLAY_MODE, SalesConstant.ORDER_MODE));
+        map.put(SalesConstant.ItemType.BACK_TYPE, PreferencesUtils.getInt(this, SalesConstant.BACK_PLAY_MODE, SalesConstant.ORDER_MODE));
+    }
+
+    public static List<PlayModeBean> playModeBeans = new ArrayList<>();
+
+    private void queryMap() {
+        playModeBeans.clear();
+        if (map != null) {
+            for (Map.Entry entry : map.entrySet()) {
+                int key = (int) entry.getKey();
+                int value = (int) entry.getValue();
+                PlayModeBean playModeBeen = new PlayModeBean();
+                playModeBeen.setItemNum(key);
+                playModeBeen.setPlayMode(value);
+                playModeBeen.setModelName(currentModelName);
+                playModeBeans.add(playModeBeen);
+            }
+        }
+    }
+
+    //更新案件播放顺序
+    private void insertModeMap() {
+        queryMap();
+        ModeManager modeManager = ModeManager.getInstance(MainActivity.this);
+        if (modeManager.isExistByName(currentModelName)) {
+            modeManager.deleteContent(currentModelName);
+        }
+        for (int i = 0; i < playModeBeans.size(); i++) {
+            PlayModeBean playModeBean = playModeBeans.get(i);
+            modeManager.insertContent(playModeBean);
+        }
+    }
+
+    private void startInitMode(ArrayList<PlayModeBean> list) {
+        if (list != null && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                PlayModeBean modelContentBean = list.get(i);
+                int mode = modelContentBean.getPlayMode();
+                if (mode != 0) {
+                    if (modelContentBean.getItemNum() == SalesConstant.ItemType.POWER_TYPE) {
+                        PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.POWER_TYPE), mode);
+                    } else if (modelContentBean.getItemNum() == SalesConstant.ItemType.GAME_TYPE) {
+                        PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.GAME_TYPE), mode);
+                    } else if (modelContentBean.getItemNum() == SalesConstant.ItemType.HOME_TYPE) {
+                        PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.HOME_TYPE), mode);
+                    } else if (modelContentBean.getItemNum() == SalesConstant.ItemType.BACK_TYPE) {
+                        PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.BACK_TYPE), mode);
+                    }
+                }
+            }
+        } else {
+            PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.POWER_TYPE), SalesConstant.CIRCLE_MODE);
+            PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.GAME_TYPE), SalesConstant.ORDER_MODE);
+            PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.HOME_TYPE), SalesConstant.ORDER_MODE);
+            PreferencesUtils.putInt(this, getSpByType(SalesConstant.ItemType.BACK_TYPE), SalesConstant.ORDER_MODE);
+        }
+        updateModeView(currentType);
     }
 
     private String FOOD_MODEL = "食品促销模版";
@@ -394,15 +474,21 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 break;
             case R.id.main_play_mode_img:
                 String mSpPlayMode = getSpByType(currentType);
-                int mMode = PreferencesUtils.getInt(this, mSpPlayMode, SalesConstant.CIRCLE_MODE);
+                int mMode = PreferencesUtils.getInt(this, mSpPlayMode, SalesConstant.ORDER_MODE);
+                int finalMode = 0;
                 if (mMode == SalesConstant.CIRCLE_MODE) {
                     PreferencesUtils.putInt(this, mSpPlayMode, SalesConstant.ORDER_MODE);
                     showToast("已切换单条播放");
+                    finalMode = SalesConstant.ORDER_MODE;
                 } else if (mMode == SalesConstant.ORDER_MODE) {
                     PreferencesUtils.putInt(this, mSpPlayMode, SalesConstant.CIRCLE_MODE);
                     showToast("已切换循环播放");
+                    finalMode = SalesConstant.CIRCLE_MODE;
                 }
                 updateModeView(currentType);
+                //将播放顺序信息录入数据库
+                map.put(currentType, finalMode);
+                insertModeMap();
                 break;
 //            case R.id.main_exchange_goods:
 //                Intent updateIntent = new Intent(this, SalesSettingActivity.class);
@@ -860,6 +946,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         adapter = new MainItemAdapter(this, list);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(this);
+        startInitMode(ModeManager.getInstance(MainActivity.this).queryListByName(currentModelName));
     }
 
     private void updateAdapterData() {
@@ -880,7 +967,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
     private void updateModeView(int currentType) {
         String playModeTypeSp = getSpByType(currentType);
-        int mMode = PreferencesUtils.getInt(this, playModeTypeSp, SalesConstant.CIRCLE_MODE);
+        int mMode = PreferencesUtils.getInt(this, playModeTypeSp, SalesConstant.ORDER_MODE);
         if (mMode == SalesConstant.CIRCLE_MODE) {
             mainPlayModeImg.setBackgroundResource(R.mipmap.circle);
             playModeHintTv.setText("顺序循环播放");
@@ -922,6 +1009,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     }
 
     CustomHintDialog mUpdateDialog;
+
     private void checkUpdateInfo() {
         final String versionName = new UpdateUtils().getVersion(getContext(), getContext().getPackageName());
         new UpdateUtils().getInstance().getAppDetail(getContext(), getContext().getPackageName(), new UpdateUtils.onAppCallBack() {
@@ -1001,6 +1089,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 PreferencesUtils.putString(MainActivity.this, "currentModelName", currentModelName);
                 updateAdapterData();
                 updateTitle();
+                startInitMode(ModeManager.getInstance(MainActivity.this).queryListByName(currentModelName));
             }
         }
     }
@@ -1022,28 +1111,5 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     protected void onDestroy() {
         super.onDestroy();
     }
-
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        L.e(TAG, "keyCode = " + keyCode);
-        return true;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        event.isTracking();
-        return true;
-    }
-
-    @Override
-    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        return true;
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        return false;
-    }
-
 
 }

@@ -6,9 +6,9 @@
 
     <RelativeLayout
         android:layout_width="1000dp"
-        android:layout_height="550dp"
-        android:layout_marginTop="70dp"
+        android:layout_height="500dp"
         android:layout_centerInParent="true"
+        android:layout_marginTop="70dp"
         android:background="@drawable/blue">
 
         <LinearLayout
@@ -16,7 +16,7 @@
             android:layout_width="800dp"
             android:layout_height="250dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="70dp"
             android:background="@drawable/white_dashed"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -70,6 +70,16 @@
                     android:text="添加商品图片"
                     android:textColor="@color/white"
                     android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/picture_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="建议图片大小为1280*800"
+                    android:textColor="#90ffffff"
+                    android:textSize="18sp"
+                    android:layout_marginLeft="15dp"
+                    />
 
                 <LinearLayout
                     android:id="@+id/picture_container"
@@ -149,10 +159,10 @@
             android:background="@drawable/next_step_bg"
             android:drawableLeft="@mipmap/next_step"
             android:drawablePadding="3dp"
+            android:paddingBottom="15dp"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:paddingTop="7dp"
-            android:paddingBottom="7dp"
+            android:paddingTop="15dp"
             android:text="@string/next_step"
             android:textColor="@color/white"
             android:textSize="28sp" />
@@ -163,8 +173,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="230dp"
         android:layout_marginBottom="0dp"
+        android:layout_marginLeft="230dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -178,11 +188,9 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/first_step_two_img"
             android:layout_marginBottom="-43dp"
             android:layout_marginLeft="-20dp"
-            />
-
+            android:src="@mipmap/first_step_two_img" />
 
 
     </LinearLayout>

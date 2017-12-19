@@ -636,14 +636,34 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     /**
      * 进入跳舞模式 Diy
      */
-    public void enterDanceModelDiy(String value, String time) {
-        Intent mIntent = new Intent("com.efrobot.dance.ENTER_DANCE_MODEL");
-        mIntent.putExtra("dance_name", value);
-        mIntent.putExtra("key", "speechDiy");
-        mIntent.putExtra("time", time);
-        mIntent.putExtra("TIME_INFO", System.currentTimeMillis());
-        mIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-        getApplicationContext().sendBroadcast(mIntent);
+    public void enterDanceModelDiy(final String value, final String time) {
+        String nickName = "跳舞时, 避障关闭，请与" + RobotManager.getInstance(context).getRobotName() + "保持一定距离";
+        TtsUtils.sendTts(this, nickName);
+        mHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent mIntent = new Intent("com.efrobot.dance.ENTER_DANCE_MODEL");
+                mIntent.putExtra("dance_name", value);
+                mIntent.putExtra("key", "speechDiy");
+                mIntent.putExtra("time", time);
+                mIntent.putExtra("TIME_INFO", System.currentTimeMillis());
+                mIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+                getApplicationContext().sendBroadcast(mIntent);
+            }
+        }, nickName.length() * 270);
+
+//        new Timer().schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Intent mIntent = new Intent("com.efrobot.dance.ENTER_DANCE_MODEL");
+//                mIntent.putExtra("dance_name", value);
+//                mIntent.putExtra("key", "speechDiy");
+//                mIntent.putExtra("time", time);
+//                mIntent.putExtra("TIME_INFO", System.currentTimeMillis());
+//                mIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
+//                getApplicationContext().sendBroadcast(mIntent);
+//            }
+//        }, nickName.length() * 270);
     }
 
     /**

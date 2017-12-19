@@ -8,6 +8,7 @@ import com.efrobot.salespromotion.bean.ModelContentBean;
 import com.efrobot.salespromotion.bean.ModelNameBean;
 import com.efrobot.salespromotion.bean.FaceAndActionEntity;
 import com.efrobot.salespromotion.bean.MainItemContentBean;
+import com.efrobot.salespromotion.bean.PlayModeBean;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -47,6 +48,7 @@ public class DbHelper extends OrmLiteSqliteOpenHelper {
 
             TableUtils.createTable(connectionSource, ModelNameBean.class);
             TableUtils.createTable(connectionSource, ModelContentBean.class);
+            TableUtils.createTable(connectionSource, PlayModeBean.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }

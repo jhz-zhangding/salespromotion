@@ -27,11 +27,13 @@
             android:id="@+id/content_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="180dp"
             android:ellipsize="end"
             android:gravity="center"
             android:padding="8dp"
             android:singleLine="true"
-            android:text="huodongfhsudkfhssf"
+            android:maxEms="6"
+            android:text=""
             android:textColor="@drawable/button_text_bg"
             android:textSize="22sp" />
 

@@ -209,6 +209,7 @@ public class ModelContentManager {
             return;
         ContentValues values = new ContentValues();
         values.put("itemNum", bean.getItemNum());
+        values.put("playMode", bean.getPlayMode());
         values.put("modelName", bean.getModelName());
         values.put("modelType", bean.getModelType());
         values.put("itemType", bean.getItemType());
@@ -247,6 +248,7 @@ public class ModelContentManager {
             return false;
         ContentValues values = new ContentValues();
         values.put("itemNum", bean.getItemNum());
+        values.put("playMode", bean.getPlayMode());
         values.put("modelName", bean.getModelName());
         values.put("modelType", bean.getModelType());
         values.put("itemType", bean.getItemType());
@@ -287,6 +289,7 @@ public class ModelContentManager {
             return;
         ContentValues values = new ContentValues();
         values.put("itemNum", bean.getItemNum());
+        values.put("playMode", bean.getPlayMode());
         values.put("modelName", bean.getModelName());
         values.put("modelType", bean.getModelType());
         values.put("itemType", bean.getItemType());

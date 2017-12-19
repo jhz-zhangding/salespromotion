@@ -5,13 +5,24 @@
     android:layout_height="match_parent"
     android:background="@mipmap/main_bg"
     android:paddingBottom="@dimen/padding"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".main.MainActivity">
 
     <RelativeLayout
         android:id="@+id/head_rl"
         android:layout_width="match_parent"
         android:layout_height="70dp">
+
+        <TextView
+            android:id="@+id/advanced_setting_version_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#90FFFFFF"
+            android:textSize="18sp"
+            android:text=""
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            />
 
         <TextView
             android:id="@+id/title"

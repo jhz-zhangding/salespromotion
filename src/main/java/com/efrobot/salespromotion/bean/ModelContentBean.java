@@ -16,6 +16,8 @@ public class ModelContentBean implements Serializable {
     private int id;
     @DatabaseField(columnName = "itemNum")
     private int itemNum;
+    @DatabaseField(columnName = "playMode")
+    private int playMode;
 
     @DatabaseField(columnName = "modelName")
     private String modelName;
@@ -100,6 +102,7 @@ public class ModelContentBean implements Serializable {
 
         this.id = c.getInt(c.getColumnIndexOrThrow("_id"));
         this.itemNum = c.getInt(c.getColumnIndexOrThrow("itemNum"));
+        this.playMode = c.getInt(c.getColumnIndexOrThrow("playMode"));
 
         this.modelName = c.getString(c.getColumnIndexOrThrow("modelName"));
         this.modelType = c.getInt(c.getColumnIndexOrThrow("modelType"));
@@ -144,6 +147,14 @@ public class ModelContentBean implements Serializable {
 
     public void setItemNum(int itemNum) {
         this.itemNum = itemNum;
+    }
+
+    public int getPlayMode() {
+        return playMode;
+    }
+
+    public void setPlayMode(int playMode) {
+        this.playMode = playMode;
     }
 
     public String getModelName() {

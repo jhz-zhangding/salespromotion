@@ -61,7 +61,7 @@
             style="@style/text_nomal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/padding_25"
+            android:layout_marginRight="130dp"
             android:background="@drawable/button_bg"
             android:gravity="center"
             android:minWidth="100dp"

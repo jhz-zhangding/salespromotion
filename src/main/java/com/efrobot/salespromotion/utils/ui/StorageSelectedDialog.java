@@ -246,7 +246,7 @@ public class StorageSelectedDialog extends CommonDialog implements View.OnClickL
             ll_storage.setVisibility(View.GONE);
             rv_content.setVisibility(View.VISIBLE);
         } else {
-            tv_prompt.setText(path + "/editdiyzipfile" + "\\n\\r" + "没有有效文件！");
+            tv_prompt.setText(path + "/salespromotionzipfile" + "\\n\\r" + "没有有效文件！");
             tv_prompt.setVisibility(View.VISIBLE);
             ll_storage.setVisibility(View.GONE);
         }

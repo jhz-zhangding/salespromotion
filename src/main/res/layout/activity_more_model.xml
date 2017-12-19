@@ -17,16 +17,18 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="70dp"
                     android:layout_centerInParent="true"
                     android:text="促销助手机器人"
                     android:textColor="@color/white"
                     android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    />
 
                 <TextView
                     android:id="@+id/sales_more_finish_btn"
@@ -49,7 +51,6 @@
                 android:layout_height="1dp"
                 android:layout_alignParentBottom="true"
                 android:background="@color/white"
-                android:layout_marginTop="10dp"
                 />
 
             <RelativeLayout
@@ -214,9 +215,9 @@
                         android:id="@+id/sales_more_group_content_list"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
+                        android:layout_marginLeft="20dp"
                         android:layout_marginTop="10dp"
-                        android:horizontalSpacing="20dp"
+                        android:horizontalSpacing="30dp"
                         android:numColumns="4"
                         android:verticalSpacing="20dp" />
 

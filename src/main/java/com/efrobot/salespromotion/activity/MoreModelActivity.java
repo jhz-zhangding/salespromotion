@@ -279,11 +279,10 @@ public class MoreModelActivity extends Activity implements View.OnClickListener 
                 });
                 break;
             case R.id.rlExport:
-                List<ModelContentBean> list = ModelContentManager.getInstance(this).queryItem(currentModelName);
-                mUtils.exportData(list);
+                mUtils.exportData(goodsContentStr);
                 break;
             case R.id.rlDelete:
-                showDeleteDialog("是否删除此模板", goodsContentStr);
+                showDeleteDialog("是否删除" + goodsContentStr, goodsContentStr);
                 break;
             case R.id.rlCreate:
                 showCreateDialog("");

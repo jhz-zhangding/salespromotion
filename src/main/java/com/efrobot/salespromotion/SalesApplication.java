@@ -50,8 +50,7 @@ public class SalesApplication extends Application {
         registerDynamicStateReceiver();
 
         instance = this;
-        PreferencesUtils.putInt(this, SalesConstant.GAME_PLAY_MODE, SalesConstant.ORDER_MODE);
-        PreferencesUtils.putInt(this, SalesConstant.HOME_PLAY_MODE, SalesConstant.ORDER_MODE);
+        PreferencesUtils.putInt(this, SalesConstant.POWER_PLAY_MODE, SalesConstant.CIRCLE_MODE);
     }
 
     private void registerDynamicStateReceiver() {

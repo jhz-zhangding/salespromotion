@@ -933,7 +933,9 @@ public class AddBodyShowView extends SalesBaseActivity<AddBodyShowPresenter> imp
             adapter.updateContent(name);
         }
         mSelectDanceTv.setText(name);
-        mDelDanceBtn.setVisibility(View.VISIBLE);
+        if(!TextUtils.isEmpty(name)) {
+            mDelDanceBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

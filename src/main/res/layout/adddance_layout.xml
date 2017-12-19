@@ -2,24 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginLeft="150dp"
         android:layout_marginTop="100dp"
-        >
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="舞蹈："
             android:textColor="@color/white"
-            android:textSize="28sp"
-            />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/add_dance_name_tv"
@@ -27,18 +24,14 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="@color/white"
-            android:textSize="28sp"
-            />
+            android:textSize="28sp" />
 
         <ImageView
             android:id="@+id/add_dance_name_del_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/del"
-            android:visibility="gone"
-            />
-
-
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -48,10 +41,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="30dp"
         android:horizontalSpacing="20dp"
         android:numColumns="2"
         android:verticalSpacing="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ff0000"
+        android:textSize="22sp"
+        android:text="注：机器人跳舞时避障关闭，空鼠无法暂停，请保证周围环境空旷，必要时摸头暂停"
+        android:layout_marginTop="35dp"
+        android:layout_gravity="center_horizontal"
+        />
 
 
 </LinearLayout>

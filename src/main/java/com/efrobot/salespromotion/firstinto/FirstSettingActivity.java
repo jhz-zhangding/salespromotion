@@ -60,6 +60,8 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
     private List<String> picPaths = new ArrayList<>();
     private LinearLayout container;
 
+    private TextView pictureHint;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -88,6 +90,8 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
         stepThreeFinish = (TextView) findViewById(R.id.first_next_btn_3);
         stepThreeFinish.setOnClickListener(this);
         findViewById(R.id.add_picture_btn).setOnClickListener(this);
+
+        pictureHint = (TextView) findViewById(R.id.picture_hint);
 
         recyclerView = (RecyclerView) findViewById(R.id.sales_first_group_list);
         groupLists.add("食品");
@@ -139,6 +143,8 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
     };
 
     private void addPicChildView(final LinearLayout parent, final String path) {
+        pictureHint.setVisibility(View.GONE);
+
         final RelativeLayout relativeLayout = new RelativeLayout(this);
         relativeLayout.setGravity(Gravity.TOP | Gravity.RIGHT);
 
@@ -157,6 +163,9 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
                 imageView.setImageBitmap(null);
                 parent.removeView(relativeLayout);
                 picPaths.remove(path);
+                if (picPaths.size() == 0) {
+                    pictureHint.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -289,7 +298,7 @@ public class FirstSettingActivity extends Activity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(resourcereceiver != null) {
+        if (resourcereceiver != null) {
             unregisterReceiver(resourcereceiver);
         }
     }
