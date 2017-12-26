@@ -249,7 +249,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     removeSpeechState(SalesPromotionService.this, 13);
                     removeSpeechState(SalesPromotionService.this, 11);
                     sendEmptyMessageDelayed(CLEAR_SPEECH_SLEEP, 5000);
-                    closeSpeechDiscern(getApplicationContext());
+                    if (!isNeedRecognition) {
+                        closeSpeechDiscern(getApplicationContext());
+                    }
                     break;
                 case SEND_CLEAR_PIC:
                     L.e(TAG, "SEND_CLEAR_PIC" + System.currentTimeMillis());
@@ -315,7 +317,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private int currentModel = -1;
 
     private void startPlay(int type) {
-
+        isNeedRecognition = false;
 
         if (mHandle != null && mHandle.hasMessages(SHOW_GOODS_PIC)) {
             if (goodsPicDialog != null && goodsPicDialog.isShowing()) {
@@ -477,6 +479,21 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         }
     }
 
+    private String getSpByType(int currentType) {
+        String playModeTypeSp = "";
+        if (currentType == SalesConstant.ItemType.POWER_TYPE) {
+            playModeTypeSp = SalesConstant.POWER_PLAY_MODE;
+        } else if (currentType == SalesConstant.ItemType.GAME_TYPE) {
+            playModeTypeSp = SalesConstant.GAME_PLAY_MODE;
+        } else if (currentType == SalesConstant.ItemType.HOME_TYPE) {
+            playModeTypeSp = SalesConstant.HOME_PLAY_MODE;
+        } else if (currentType == SalesConstant.ItemType.BACK_TYPE) {
+            playModeTypeSp = SalesConstant.BACK_PLAY_MODE;
+        }
+        return playModeTypeSp;
+    }
+
+
     private Dialog goodsPicDialog;
 
     private void showGoodsPic(String picPath) {
@@ -549,6 +566,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
         if (actionList != null && actionList.size() > 0) {
             currentCount = 0;
+            isActionFinish = false;
             checkAction(actionList.get(currentCount));
         } else
             isActionFinish = true;
@@ -678,6 +696,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
         @Override
         public void onStop() {
+            isActionFinish = true;
             groupManager.removeListener(groupTaskListener);
             L.e(TAG, "执行动作结束");
             if (mHandle != null)
@@ -692,10 +711,22 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
     public void pause() {
         hitRobotHead();
+        L.e(TAG, "pause()");
+        isPause = true;
+        isNeedReceiveTtsEnd = false;
         removeSpeechState(SalesPromotionService.this, 13);
         removeSpeechState(SalesPromotionService.this, 11);
         stopAllPlaying();
-        isPause = true;
+        if (mHandle != null) {
+            mHandle.removeMessages(SHOW_GOODS_PIC);
+        }
+        if (goodsPicDialog != null && goodsPicDialog.isShowing()) {
+            goodsPicDialog.dismiss();
+        }
+        if (groupManager != null) {
+            groupManager.stop();
+            groupManager.reset();
+        }
     }
 
     private void hitRobotHead() {
@@ -709,6 +740,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             e.printStackTrace();
         }
         intent.putExtra("content", json.toString());
+        intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
         sendBroadcast(intent);
     }
 
@@ -728,12 +760,12 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         isMusicFinish = true;
 
         //图片停止
-        if (pictureDialog != null) {
+        if (pictureDialog != null && pictureDialog.isShowing()) {
             pictureDialog.dismiss();
             isPictureFinish = true;
         }
 
-        if (goodsPicDialog != null) {
+        if (goodsPicDialog != null && goodsPicDialog.isShowing()) {
             goodsPicDialog.dismiss();
         }
 
@@ -809,65 +841,6 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         }
     };
 
-    private boolean checkTime() {
-        boolean isCanPress = false;
-        currentTime = System.currentTimeMillis();
-        if (currentTime - lastKeyDownTime > 600) {
-            isCanPress = true;
-        }
-        return isCanPress;
-    }
-
-    private long lastKeyDownTime = 0;
-    private long currentTime = 0;
-
-    @Override
-    public void onKeyDown(int keyCode) {
-        L.e(TAG, "onKeyDown:" + keyCode);
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_POWER:
-                if (!checkTime()) return;
-                startPlayMode(SalesConstant.ItemType.POWER_TYPE);
-                break;
-            case KeyEvent.KEYCODE_MENU:
-                if (!checkTime()) return;
-                startPlayMode(SalesConstant.ItemType.GAME_TYPE);
-                break;
-            case KeyEvent.KEYCODE_HOME:
-                if (!checkTime()) return;
-                startPlayMode(SalesConstant.ItemType.HOME_TYPE);
-                break;
-            case KeyEvent.KEYCODE_BACK:
-                if (!checkTime()) return;
-                startPlayMode(SalesConstant.ItemType.BACK_TYPE);
-                break;
-            case KeyEvent.KEYCODE_ENTER:
-                if (!isPause) {
-                    pause();
-                    currentIndex--;
-                }
-                break;
-            case KeyEvent.KEYCODE_DPAD_UP:
-                moveManager.doDownExecute(keyCode);
-                break;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                moveManager.doDownExecute(keyCode);
-                break;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                moveManager.doDownExecute(keyCode);
-                break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                moveManager.doDownExecute(keyCode);
-                break;
-            case KeyEvent.KEYCODE_VOLUME_UP:
-                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
-                break;
-            case KeyEvent.KEYCODE_VOLUME_DOWN:
-                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
-                break;
-        }
-    }
-
     public void againPlayCurrentItem() {
         pause();
         currentIndex--;
@@ -898,18 +871,72 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         }
     }
 
-    private String getSpByType(int currentType) {
-        String playModeTypeSp = "";
-        if (currentType == SalesConstant.ItemType.POWER_TYPE) {
-            playModeTypeSp = SalesConstant.POWER_PLAY_MODE;
-        } else if (currentType == SalesConstant.ItemType.GAME_TYPE) {
-            playModeTypeSp = SalesConstant.GAME_PLAY_MODE;
-        } else if (currentType == SalesConstant.ItemType.HOME_TYPE) {
-            playModeTypeSp = SalesConstant.HOME_PLAY_MODE;
-        } else if (currentType == SalesConstant.ItemType.BACK_TYPE) {
-            playModeTypeSp = SalesConstant.BACK_PLAY_MODE;
+    private boolean checkTime() {
+        boolean isCanPress = false;
+        currentTime = System.currentTimeMillis();
+        if (currentTime - lastKeyDownTime > 600) {
+            isCanPress = true;
         }
-        return playModeTypeSp;
+        return isCanPress;
+    }
+
+    private long lastKeyDownTime = 0;
+    private long currentTime = 0;
+    private boolean isLongPressKey = false;
+
+    @Override
+    public void onKeyDown(int keyCode) {
+        L.e(TAG, "onKeyDown:" + keyCode);
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_POWER:
+                if (!checkTime()) return;
+                startPlayMode(SalesConstant.ItemType.POWER_TYPE);
+                break;
+            case KeyEvent.KEYCODE_MENU:
+                if (!checkTime()) return;
+                startPlayMode(SalesConstant.ItemType.GAME_TYPE);
+                break;
+            case KeyEvent.KEYCODE_HOME:
+                if (!checkTime()) return;
+                startPlayMode(SalesConstant.ItemType.HOME_TYPE);
+                break;
+            case KeyEvent.KEYCODE_BACK:
+                if (!checkTime()) return;
+                startPlayMode(SalesConstant.ItemType.BACK_TYPE);
+                break;
+            case KeyEvent.KEYCODE_ENTER:
+                L.e(TAG, "onKeyDown: KeyEvent.KEYCODE_ENTER");
+                try {
+                    if (!isLongPressKey) {
+                        if (!isPause) {
+                            pause();
+                            currentIndex--;
+                        }
+                        isNeedRecognition = false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                moveManager.doDownExecute(keyCode);
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                moveManager.doDownExecute(keyCode);
+                break;
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                moveManager.doDownExecute(keyCode);
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                moveManager.doDownExecute(keyCode);
+                break;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
+                break;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
+                break;
+        }
     }
 
     @Override
@@ -928,12 +955,32 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 moveManager.doUpExecute();
                 break;
+            case KeyEvent.KEYCODE_ENTER:
+                if (isLongPressKey) {
+                    isLongPressKey = false;
+                }
+                break;
         }
     }
 
+    //是否需要识别
+    private boolean isNeedRecognition = false;
+
     @Override
     public void onKeyLongPress(int keyCode) {
-
+        L.e(TAG, "onKeyLongPress:" + keyCode);
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_ENTER:
+                isLongPressKey = true;
+                try {
+                    isNeedRecognition = true;
+                    TtsUtils.sendTts(this, "已为您开启语音");
+                    speechManager.openSpeechDiscern(this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 
     /**
@@ -972,6 +1019,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        isPause = false;
         SalesApplication.from(this).setSalesPromotionService(null);
         SpeechManager.getInstance(this).controlHead(this, false);
         L.e(TAG, "onDestroy()");
@@ -993,7 +1041,6 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             mHandle.removeMessages(SAY_START_WORDS);
             mHandle = null;
         }
-
 
     }
 

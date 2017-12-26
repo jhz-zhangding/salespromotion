@@ -128,7 +128,7 @@ public class SalesApplication extends Application {
     }
 
     public void dismissGuestVideo() {
-        if (mediaPlayDialog != null) {
+        if (mediaPlayDialog != null && mediaPlayDialog.isShowing()) {
             mediaPlayDialog.dismiss();
             mediaPlayDialog = null;
         }

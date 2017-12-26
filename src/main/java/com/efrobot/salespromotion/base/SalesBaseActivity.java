@@ -14,7 +14,7 @@ public abstract class SalesBaseActivity<T extends SalesBasePresenter> extends Pr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setFullScreen();
+//        setFullScreen();
 
     }
 
@@ -31,7 +31,7 @@ public abstract class SalesBaseActivity<T extends SalesBasePresenter> extends Pr
             uiFlags |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
         }
 
-//        getWindow().getDecorView().setSystemUiVisibility(uiFlags);
+        getWindow().getDecorView().setSystemUiVisibility(uiFlags);
     }
 
     public boolean isShouldHideInput(View v, MotionEvent event) {

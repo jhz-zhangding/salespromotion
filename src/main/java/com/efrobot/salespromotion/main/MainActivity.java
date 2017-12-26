@@ -15,9 +15,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -154,6 +156,8 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     protected void onViewInit() {
         super.onViewInit();
 
+        setFullScreen();
+
         versionName = (TextView) findViewById(R.id.advanced_setting_version_name);
         String versionInfo = new UpdateUtils().getVersion(this, this.getPackageName());
         if (!TextUtils.isEmpty(versionInfo)) {
@@ -207,8 +211,9 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 
         findViewById(R.id.rlExport).setOnClickListener(this);
         findViewById(R.id.rlImport).setOnClickListener(this);
-//        findViewById(R.id.main_create_model_data).setOnClickListener(this);
+        findViewById(R.id.main_create_model_data).setOnClickListener(this);
         findViewById(R.id.main_more_model).setOnClickListener(this);
+        findViewById(R.id.back).setOnClickListener(this);
 
         mHandle.sendEmptyMessage(MSG_UNCOMPRESS_DEFAULT);
         setMap();
@@ -419,6 +424,9 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.back:
+                finish();
+                break;
             case R.id.main_item_add_btn:
                 List<ModelNameBean> los = ModelNameDataManager.getInstance(this).queryListByName(currentModelName);
                 int modelType = -1;
@@ -556,11 +564,33 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 }
 
                 break;
-//            case R.id.main_create_model_data:
-            //新建模板
-//                showDialog();
-//                break;
+            case R.id.main_create_model_data:
+                // 帮助提示
+                showHelpDialog();
+                break;
         }
+    }
+
+    private Dialog mHelpDialiog;
+
+    private void showHelpDialog() {
+        if (mHelpDialiog == null) {
+            mHelpDialiog = new Dialog(getContext(), R.style.Dialog_Help_Fullscreen);
+            View currentView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_help, null);
+
+            ImageView imageView = (ImageView) currentView.findViewById(R.id.dialog_close);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mHelpDialiog.isShowing()) {
+                        mHelpDialiog.dismiss();
+                    }
+                }
+            });
+            mHelpDialiog.setContentView(currentView);
+            mHelpDialiog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+        }
+        mHelpDialiog.show();
     }
 
     private Dialog modelDialog;
@@ -1092,6 +1122,40 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 startInitMode(ModeManager.getInstance(MainActivity.this).queryListByName(currentModelName));
             }
         }
+    }
+
+    /***
+     * 解决软键盘弹出时任务栏不隐藏和单击输入框以外区域输入法不隐藏的bug
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (isShouldHideInput(v, ev)) {
+                int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN; // hide status bar
+
+                if (android.os.Build.VERSION.SDK_INT >= 19) {
+                    uiFlags |= 0x00001000;    //SYSTEM_UI_FLAG_IMMERSIVE_STICKY: hide navigation bars - compatibility: building API level is lower thatn 19, use magic number directly for higher API target level
+                } else {
+                    uiFlags |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
+                }
+                getWindow().getDecorView().setSystemUiVisibility(uiFlags);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+            return super.dispatchTouchEvent(ev);
+        }
+        // 必不可少，否则所有的组件都不会有TouchEvent了
+        if (getWindow().superDispatchTouchEvent(ev)) {
+            return true;
+        }
+        return onTouchEvent(ev);
     }
 
     @Override

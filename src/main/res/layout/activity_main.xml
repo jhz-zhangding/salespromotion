@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/main_bg"
-    android:paddingBottom="@dimen/padding"
+    android:paddingBottom="@dimen/padding_5"
     tools:context=".main.MainActivity">
 
     <RelativeLayout
@@ -61,6 +61,18 @@
             android:padding="@dimen/padding_20"
             android:src="@mipmap/import_img"
             android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:padding="@dimen/padding_15"
+            android:src="@mipmap/back"
+            android:visibility="visible"
             />
 
     </RelativeLayout>
@@ -196,12 +208,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="60dp"
-                android:background="#386498"
+                android:background="#357ADA"
                 android:gravity="center"
                 android:minHeight="50dp"
-                android:text="关闭面罩即可促销"
+                android:text="空鼠使用说明"
                 android:textColor="@color/white"
                 android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:minHeight="50dp"
+                android:text="(关闭面罩开始促销)"
+                android:textColor="@color/orange"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -322,7 +345,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp">
+                android:paddingTop="5dp"
+                >
 
                 <!--<TextView-->
                     <!--android:id="@+id/main_exchange_goods"-->
@@ -334,6 +358,15 @@
                     <!--android:text="@string/more_sales_goods"-->
                     <!--android:textColor="@color/white"-->
                     <!--android:textSize="28sp" />-->
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="280dp"
+                    android:background="@mipmap/start_play_text"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"
+                    />
 
                 <TextView
                     android:id="@+id/main_more_model"
