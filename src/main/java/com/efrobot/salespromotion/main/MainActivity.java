@@ -485,7 +485,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 int finalMode = 0;
                 if (mMode == SalesConstant.CIRCLE_MODE) {
                     PreferencesUtils.putInt(this, mSpPlayMode, SalesConstant.ORDER_MODE);
-                    showToast("已切换单条播放");
+                    showToast("已切换逐条播放");
                     finalMode = SalesConstant.ORDER_MODE;
                 } else if (mMode == SalesConstant.ORDER_MODE) {
                     PreferencesUtils.putInt(this, mSpPlayMode, SalesConstant.CIRCLE_MODE);
@@ -1012,10 +1012,10 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         int mMode = PreferencesUtils.getInt(this, playModeTypeSp, SalesConstant.ORDER_MODE);
         if (mMode == SalesConstant.CIRCLE_MODE) {
             mainPlayModeImg.setBackgroundResource(R.mipmap.circle);
-            playModeHintTv.setText("顺序循环播放");
+            playModeHintTv.setText("循环播放");
         } else if (mMode == SalesConstant.ORDER_MODE) {
             mainPlayModeImg.setBackgroundResource(R.mipmap.order);
-            playModeHintTv.setText("顺序单条播放");
+            playModeHintTv.setText("逐条播放");
         }
     }
 

@@ -117,6 +117,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private int picIndex = 0;
     private int currentType;
     private String tts;
+    private DanceBroadcastReceiver broadcastReceiver;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -151,7 +152,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
 
         mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
-        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 8000);
+        mHandle.sendEmptyMessageDelayed(START_AUTO_PLAY, 10000);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -992,12 +993,15 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private void registerDynamicStateReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(DANCE_COMPLETE_PLAY);
+        broadcastReceiver = new DanceBroadcastReceiver();
         registerReceiver(broadcastReceiver, filter);
     }
 
 
     String DANCE_COMPLETE_PLAY = "com.efrobot.dance.ROBOT_DANCE_FINISH";
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+    private class DanceBroadcastReceiver extends BroadcastReceiver {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(DANCE_COMPLETE_PLAY)) {
@@ -1007,7 +1011,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 finishAfterDoSomeThing();
             }
         }
-    };
+    }
 
     private void clearAllMessage() {
         if (mHandle != null) {
