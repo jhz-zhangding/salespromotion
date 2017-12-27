@@ -27,17 +27,15 @@
             android:layout_height="wrap_content"
             android:background="@mipmap/dialog_help_image1"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="50dp"
-            android:scaleX="0.9"
-            android:scaleY="0.9"
+            android:layout_marginLeft="180dp"
             />
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@mipmap/dialog_help_image2"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="50dp"
-            android:layout_marginLeft="530dp"
+            android:layout_marginTop="-80dp"
+            android:layout_marginLeft="400dp"
             android:scaleX="0.9"
             android:scaleY="0.9"
             />

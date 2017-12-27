@@ -150,13 +150,12 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
         SalesApplication.isNeedStartService = true;
         L.e(TAG, "onResume isNeedStartService = " + SalesApplication.isNeedStartService);
         StatService.onResume(this);
+        setFullScreen();
     }
 
     @Override
     protected void onViewInit() {
         super.onViewInit();
-
-        setFullScreen();
 
         versionName = (TextView) findViewById(R.id.advanced_setting_version_name);
         String versionInfo = new UpdateUtils().getVersion(this, this.getPackageName());
@@ -584,12 +583,25 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
                 public void onClick(View view) {
                     if (mHelpDialiog.isShowing()) {
                         mHelpDialiog.dismiss();
+                        setFullScreen();
                     }
                 }
             });
             mHelpDialiog.setContentView(currentView);
-            mHelpDialiog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
         }
+        int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN; // hide status bar
+
+        if (android.os.Build.VERSION.SDK_INT >= 19) {
+            uiFlags |= 0x00001000;    //SYSTEM_UI_FLAG_IMMERSIVE_STICKY: hide navigation bars - compatibility: building API level is lower thatn 19, use magic number directly for higher API target level
+        } else {
+            uiFlags |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        }
+
+        mHelpDialiog.getWindow().getDecorView().setSystemUiVisibility(uiFlags);
         mHelpDialiog.show();
     }
 

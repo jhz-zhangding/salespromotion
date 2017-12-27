@@ -63,16 +63,19 @@
             android:visibility="gone"
             />
 
-        <ImageView
+        <TextView
             android:id="@+id/back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="15dp"
-            android:padding="@dimen/padding_15"
-            android:src="@mipmap/back"
-            android:visibility="visible"
+            android:layout_marginRight="25dp"
+            android:drawableLeft="@mipmap/back"
+            android:drawablePadding="5dp"
+            android:text="退出"
+            android:textSize="22sp"
+            android:textColor="@color/white"
+            android:gravity="center"
             />
 
     </RelativeLayout>

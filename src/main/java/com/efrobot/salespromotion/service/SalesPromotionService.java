@@ -249,9 +249,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     removeSpeechState(SalesPromotionService.this, 13);
                     removeSpeechState(SalesPromotionService.this, 11);
                     sendEmptyMessageDelayed(CLEAR_SPEECH_SLEEP, 5000);
-                    if (!isNeedRecognition) {
-                        closeSpeechDiscern(getApplicationContext());
-                    }
+                    closeSpeechDiscern(getApplicationContext());
                     break;
                 case SEND_CLEAR_PIC:
                     L.e(TAG, "SEND_CLEAR_PIC" + System.currentTimeMillis());
@@ -317,7 +315,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private int currentModel = -1;
 
     private void startPlay(int type) {
-        isNeedRecognition = false;
+        if (mHandle != null && !mHandle.hasMessages(CLEAR_SPEECH_SLEEP)) {
+            mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
+        }
 
         if (mHandle != null && mHandle.hasMessages(SHOW_GOODS_PIC)) {
             if (goodsPicDialog != null && goodsPicDialog.isShowing()) {
@@ -912,7 +912,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                             pause();
                             currentIndex--;
                         }
-                        isNeedRecognition = false;
+                        if (mHandle != null && !mHandle.hasMessages(CLEAR_SPEECH_SLEEP)) {
+                            mHandle.sendEmptyMessage(CLEAR_SPEECH_SLEEP);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -963,9 +965,6 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         }
     }
 
-    //是否需要识别
-    private boolean isNeedRecognition = false;
-
     @Override
     public void onKeyLongPress(int keyCode) {
         L.e(TAG, "onKeyLongPress:" + keyCode);
@@ -973,8 +972,11 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             case KeyEvent.KEYCODE_ENTER:
                 isLongPressKey = true;
                 try {
-                    isNeedRecognition = true;
-                    TtsUtils.sendTts(this, "已为您开启语音");
+                    if (mHandle != null && mHandle.hasMessages(CLEAR_SPEECH_SLEEP)) {
+                        mHandle.removeMessages(CLEAR_SPEECH_SLEEP);
+                    }
+                    String speechText = "您可以和" + RobotManager.getInstance(this).getRobotName() + "聊天啦";
+                    TtsUtils.sendTts(this, speechText);
                     speechManager.openSpeechDiscern(this);
                 } catch (Exception e) {
                     e.printStackTrace();
