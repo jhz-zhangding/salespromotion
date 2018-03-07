@@ -18,10 +18,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.base.dialog.CommonDialog;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;
 import com.efrobot.salespromotion.adapter.FileAdapter;
+import com.efrobot.salespromotion.dialog.CommonDialog;
 import com.efrobot.salespromotion.interfaces.IDialogDismiss;
 import com.efrobot.salespromotion.utils.DataFileUtils;
 import com.efrobot.salespromotion.utils.FileUtil;

@@ -2,6 +2,7 @@ package com.efrobot.salespromotion.player;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.view.WindowManager;
@@ -28,6 +29,14 @@ public class MediaPlayDialog extends Dialog {
         setContentView(R.layout.activity_media_play);
         this.mContext = context;
         application = SalesApplication.from(mContext);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT | WindowManager.LayoutParams.TYPE_SYSTEM_ERROR |
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | PixelFormat.TRANSPARENT);
+        lp.type = WindowManager.LayoutParams.TYPE_TOAST;
+        //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE是关键！！！！！
+        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        getWindow().setAttributes(lp);
 
         getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
         mVideoView = (VideoView) findViewById(R.id.media_surface_view);

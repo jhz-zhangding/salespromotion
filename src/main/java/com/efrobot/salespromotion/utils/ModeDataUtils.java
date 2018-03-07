@@ -1,6 +1,6 @@
 package com.efrobot.salespromotion.utils;
 
-import com.base.utils.L;
+import com.efrobot.library.mvp.utils.L;
 import com.efrobot.salespromotion.bean.PlayModeBean;
 
 import java.util.List;
@@ -13,15 +13,15 @@ public class ModeDataUtils {
     private static ModeDataUtils instance;
 
     public static ModeDataUtils getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new ModeDataUtils();
         }
         return instance;
     }
 
     public void setData(List<PlayModeBean> list) {
-        if(list != null && list.size() > 0) {
-            L.e("ModeDataUtils" , "setData");
+        if (list != null && list.size() > 0) {
+            L.e("ModeDataUtils", "setData");
 
 
         }

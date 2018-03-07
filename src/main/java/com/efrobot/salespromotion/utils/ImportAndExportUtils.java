@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.base.utils.L;
+import com.efrobot.library.mvp.utils.L;
 import com.efrobot.library.mvp.utils.RobotToastUtil;
 import com.efrobot.salespromotion.Env.SalesConstant;
 import com.efrobot.salespromotion.R;

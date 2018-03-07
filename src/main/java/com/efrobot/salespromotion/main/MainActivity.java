@@ -31,8 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
-import com.base.utils.L;
 import com.efrobot.library.mvp.presenter.BasePresenter;
+import com.efrobot.library.mvp.utils.L;
 import com.efrobot.library.mvp.utils.RobotToastUtil;
 import com.efrobot.library.net.TextMessage;
 import com.efrobot.salespromotion.Env.SalesConstant;

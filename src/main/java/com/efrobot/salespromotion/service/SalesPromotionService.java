@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -205,6 +206,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     public final int START_AUTO_PLAY = 8;
     public final int PICTURE_FINISH = 9;
     public final int SAY_START_WORDS = 10;
+
+    public final int SHOW_USER_PICTURE = 11;
+    public final int SHOW_USER_VIDEO = 12;
     private int clearPicTime = 3000;
     public Handler mHandle = new Handler() {
         @Override
@@ -216,6 +220,12 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                     isTtsFinish = true;
                     isFaceFinish = true;
                     L.e(TAG, "--------------------TTS_FINISH");
+
+                    if (pictureDialog != null && pictureDialog.isShowing()) {
+                        pictureDialog.dismiss();
+                    }
+                    isPictureFinish = true;
+
                     finishAfterDoSomeThing();
                     break;
                 case PICTURE_FINISH:
@@ -277,6 +287,48 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 case SAY_START_WORDS:
                     TtsUtils.sendTts(context, tts);
                     break;
+                case SHOW_USER_PICTURE:
+                    File mFile = (File) msg.obj;
+                    if (mFile != null) {
+                        pictureDialog = new Dialog(SalesPromotionService.this, R.style.Dialog_Fullscreen);
+                        View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
+                        ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
+                        playAdPicture(adPlayerPic, mFile);
+                        pictureDialog.setContentView(currentView);
+
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                                WindowManager.LayoutParams.WRAP_CONTENT | WindowManager.LayoutParams.TYPE_SYSTEM_ERROR |
+                                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | PixelFormat.TRANSPARENT);
+                        lp.type = WindowManager.LayoutParams.TYPE_TOAST;
+                        //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE是关键！！！！！
+                        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                        pictureDialog.getWindow().setAttributes(lp);
+
+                        pictureDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+
+                        pictureDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                            @Override
+                            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+
+                                L.e("onKey", "keyEvent = " + keyEvent.getAction());
+
+                                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+
+                                }
+
+                                return false;
+                            }
+                        });
+
+                        pictureDialog.show();
+                    }
+                    break;
+                case SHOW_USER_VIDEO:
+                    String audioPath = (String) msg.obj;
+                    SalesApplication.from(SalesPromotionService.this).playGuestVideoByPath(audioPath);
+                    isMediaFinish = false;
+                    isPictureFinish = true;
+                    break;
             }
         }
     };
@@ -314,6 +366,8 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
     private Dialog pictureDialog;
 
     private int currentModel = -1;
+
+    private boolean isExistUserPicture = false;
 
     private void startPlay(int type) {
         if (mHandle != null && !mHandle.hasMessages(CLEAR_SPEECH_SLEEP)) {
@@ -372,16 +426,26 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 } else {
                     isDanceFinish = true;
 
+                    if (!TextUtils.isEmpty(currentBean.getMedia())) {
+                        if (!currentBean.getMedia().toLowerCase().endsWith(".mp4")) {
+                            isExistUserPicture = true;
+                        } else {
+                            isExistUserPicture = false;
+                        }
+                    } else {
+                        isExistUserPicture = false;
+                    }
 
                     /** 播放语音 **/
                     if (!TextUtils.isEmpty(currentBean.getOther())) {
+
 //                TtsUtils.closeTTs(UltrasonicService.this);
                         isTtsFinish = false;
 
                         String finalTtsString = currentBean.getOther().replace(SalesConstant.ProjectInfo.PRODUCT_NAME, goodsName).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_GROUP, goodsGroup).
                                 replace(SalesConstant.ProjectInfo.PRODUCT_DETAIL, goodsDetail);
-                        if (!TextUtils.isEmpty(picPath)) {
+                        if (!TextUtils.isEmpty(picPath) && !isExistUserPicture) {
                             if (finalTtsString.contains(goodsName)) {
                                 String[] ttsStrings = finalTtsString.split(goodsName);
                                 int lastLength = 0;
@@ -426,21 +490,19 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
 
                         if (currentBean.getMedia().toLowerCase().endsWith(".mp4")) {
                             //播放视频
-                            SalesApplication.from(this).playGuestVideoByPath(currentBean.getMedia());
-                            isPictureFinish = true;
+                            Message message = mHandle.obtainMessage();
+                            message.what = SHOW_USER_VIDEO;
+                            message.obj = currentBean.getMedia();
+                            mHandle.sendMessage(message);
                         } else {
                             //播放图片
                             if (!TextUtils.isEmpty(currentBean.getMedia())) {
                                 File mFile = new File(currentBean.getMedia());
                                 if (mFile.exists()) {
-                                    pictureDialog = new Dialog(this, R.style.Dialog_Fullscreen);
-                                    View currentView = LayoutInflater.from(SalesPromotionService.this).inflate(R.layout.ul_picture_dialog, null);
-                                    ImageView adPlayerPic = (ImageView) currentView.findViewById(R.id.ul_picture_img);
-                                    playAdPicture(adPlayerPic, mFile);
-                                    pictureDialog.setContentView(currentView);
-                                    pictureDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
-                                    pictureDialog.show();
-                                    mHandle.sendEmptyMessageDelayed(PICTURE_FINISH, picDismissTime);
+                                    Message message = mHandle.obtainMessage();
+                                    message.what = SHOW_USER_PICTURE;
+                                    message.obj = mFile;
+                                    mHandle.sendMessage(message);
                                 }
                             }
                             isMediaFinish = true;
@@ -853,7 +915,7 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
         }, 600);
     }
 
-    private void startPlayMode(int type) {
+    private void startPlayMode(final int type) {
 
         String mSpPlayMode = getSpByType(type);
         mPlayMode = PreferencesUtils.getInt(this, mSpPlayMode, SalesConstant.CIRCLE_MODE);
@@ -862,12 +924,27 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
             isUserBreak = true;
             lists = ModelContentManager.getInstance(this).queryItem(currentModelName, type);
             stopAllPlaying();
-            startPlay(type);
+//            startPlay(type);
+            hitRobotHead();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    startPlay(type);
+                }
+            }, 600);
         } else {
             //单条模式才能按键继续
             if (mPlayMode == SalesConstant.ORDER_MODE || isPause) {
-                if (isAllPlayFinish())
-                    startPlay(type);
+                if (isAllPlayFinish()) {
+                    hitRobotHead();
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            startPlay(type);
+                        }
+                    }, 600);
+                }
+//                    startPlay(type);
             }
         }
     }
@@ -975,6 +1052,9 @@ public class SalesPromotionService extends Service implements OnKeyEventListener
                 try {
                     if (mHandle != null && mHandle.hasMessages(CLEAR_SPEECH_SLEEP)) {
                         mHandle.removeMessages(CLEAR_SPEECH_SLEEP);
+                    }
+                    if (mHandle != null && mHandle.hasMessages(START_AUTO_PLAY)) {
+                        mHandle.removeMessages(START_AUTO_PLAY);
                     }
                     String speechText = "您可以和" + RobotManager.getInstance(this).getRobotName() + "聊天啦";
                     TtsUtils.sendTts(this, speechText);

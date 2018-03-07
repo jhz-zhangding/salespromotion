@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_25"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
@@ -68,7 +68,8 @@
             android:paddingBottom="@dimen/padding_15dp"
             android:paddingTop="@dimen/padding_15dp"
             android:textColor="@color/white"
-            android:textSize="@dimen/textsize_26" />
+            android:textSize="@dimen/textsize_26"
+            />
 
         <TextView
             android:id="@+id/tv_ok"

@@ -33,14 +33,20 @@ public class TtsUtils {
     /**
      * 关闭TTS
      */
-    public static void closeTTs(Context context) {
-        Intent intent = new Intent("com.efrobot.speech.voice.ACTION_TTS");
-        final Map<String, Object> map = new HashMap<String, Object>();
-        map.put("modelType", "stopTTS");
-        intent.putExtra("data", simpleMapToJsonStr(map));
-        L.i("TtsUtils", "data = " + simpleMapToJsonStr(map));
-        context.sendBroadcast(intent);
+    public static void closeTTs(Context context, String content) {
+        try {
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("content", content);
+            jsonObject.put("modelType", "speechSleep");
+            Intent intent = new Intent("com.efrobot.speech.voice.ACTION_TTS");
+            intent.putExtra("data", jsonObject.toString());
+            context.sendBroadcast(intent);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
 
     /**
      * 生成Json

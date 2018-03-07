@@ -12,8 +12,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.base.dialog.CommonDialog;
 import com.efrobot.salespromotion.R;
+import com.efrobot.salespromotion.dialog.CommonDialog;
 
 /**
  * Created by lenovo on 2016/11/27.

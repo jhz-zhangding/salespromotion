@@ -15,9 +15,6 @@ public class SalesSpeechProvider extends SpeechSdkProvider {
 
     public static OnKeyEventListener mOnKeyEventListener;
 
-    //是否在执行促销TTS语音
-    private boolean isExecuteSaleTts = false;
-
     //执行促销TTS语音被打断
     private boolean isBreakSaleTts = false;
 
@@ -62,13 +59,9 @@ public class SalesSpeechProvider extends SpeechSdkProvider {
         super.TTSStart();
         Log.e(TAG, "TTSStart：" + "isNeedReceiveTtsEnd  =  " + SalesPromotionService.isNeedReceiveTtsEnd);
         if (SalesPromotionService.isNeedReceiveTtsEnd) {
-            if (!isExecuteSaleTts) {
-                isExecuteSaleTts = true;
-            } else {
-                //TTS正在执行但被打断，结束需要重新播
-                if(!SalesPromotionService.isUserBreak) {
-                    isBreakSaleTts = true;
-                }
+            //TTS正在执行但被打断，结束需要重新播
+            if (!SalesPromotionService.isUserBreak) {
+                isBreakSaleTts = true;
             }
         }
     }
@@ -81,23 +74,19 @@ public class SalesSpeechProvider extends SpeechSdkProvider {
 
         if (SalesPromotionService.isNeedReceiveTtsEnd) {
             if (!isBreakSaleTts) {
-                if (isExecuteSaleTts) {
-                    SalesPromotionService.isNeedReceiveTtsEnd = false;
-                    if (application != null && application.salesPromotionService != null) {
-                        if (application.salesPromotionService.mHandle != null) {
-                            application.salesPromotionService.mHandle.sendEmptyMessage(application.salesPromotionService.TTS_FINISH);
-                        }
+                SalesPromotionService.isNeedReceiveTtsEnd = false;
+                if (application != null && application.salesPromotionService != null) {
+                    if (application.salesPromotionService.mHandle != null) {
+                        application.salesPromotionService.mHandle.sendEmptyMessage(application.salesPromotionService.TTS_FINISH);
                     }
-                    isExecuteSaleTts = false;
                 }
             } else {
                 //TTS正在执行但被打断，结束需要重新播
-                isExecuteSaleTts = false;
                 isBreakSaleTts = false;
                 if (application != null && application.salesPromotionService != null) {
-                    if(!SalesPromotionService.isUserBreak) {
+                    if (!SalesPromotionService.isUserBreak) {
                         application.salesPromotionService.againPlayCurrentItem();
-                    } else  {
+                    } else {
                         SalesPromotionService.isUserBreak = false;
                     }
                 }

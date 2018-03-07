@@ -3,7 +3,7 @@ package com.efrobot.salespromotion.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.base.utils.L;
+import com.efrobot.library.mvp.utils.L;
 
 import org.apache.http.util.EncodingUtils;
 
