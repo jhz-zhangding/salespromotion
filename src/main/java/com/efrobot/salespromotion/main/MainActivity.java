@@ -1080,7 +1080,7 @@ public class MainActivity extends SalesBaseActivity<MainPresenter> implements IM
 //                                        getContext().startActivity(intent);
 //                                    }
 //                                });
-                                mUpdateDialog.setCancleButton("确 定", new CustomHintDialog.IButtonOnClickLister() {
+                                mUpdateDialog.setSubmitButton("确 定", new CustomHintDialog.IButtonOnClickLister() {
                                     @Override
                                     public void onClickLister() {
                                         if (mUpdateDialog != null) {
